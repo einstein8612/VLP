@@ -1,0 +1,104 @@
+import argparse
+import os
+
+import numpy as np
+import numpy.typing as npt
+from scipy.io import loadmat
+from tqdm import tqdm
+
+import pandas as pd
+
+def load_data(folder_path: str, normalise: bool) -> npt.NDArray[np.float32]:
+    """
+    Load data from a folder containing .mat files.
+    """
+    # Get all relevant .mat files in the folder
+    mat_files = [f for f in os.listdir(folder_path) if "row" in f]
+
+    # Load each .mat file and concatenate the data
+    data = []
+    for file in tqdm(mat_files, "Loading .mat files"):
+        file_path = os.path.join(folder_path, file)
+        data.append(load_data_from_mat(file_path))
+
+    data = np.concatenate(data, axis=0)
+
+    # Normalise the data
+    if normalise:
+        # Normalise the data to the range [0, 1]
+        max_val = np.max(data[:, 3:], axis=0)
+        data[:, 3:] = data[:, 3:] / max_val
+    
+    return data
+
+
+def load_data_from_mat(file_path: str) -> npt.NDArray[np.float32]:
+    """
+    Load data from a single .mat file.
+    """
+    # Load the .mat file
+    mat = loadmat(file_path)
+
+    rx_id = mat["rx_id"][0] - 1  # Zero-based index
+    no_it = mat["no_it"][0][0].astype(np.int16)
+    offset = mat["offset"]  # Offset is the offset of each receiver
+    resolution = mat["resolution"][0][0].astype(np.int16)
+    pos_z = mat["height"][0][0]
+
+    # Measurement data
+    channel_data = mat["swing"]
+
+    row_id = int(file_path.split("_")[-1].split(".")[0])
+
+    # Create a list to hold the rows
+    row_amount = len(rx_id) * channel_data.shape[3] * no_it
+    rows = np.zeros((row_amount, 39), dtype=np.float32)
+
+    i = 0
+    for id in rx_id:
+        offset_x = offset[id][0]
+        offset_y = offset[id][1]
+        for x in range(0, channel_data.shape[3]):
+            for it in range(0, no_it):
+                # Select 1 measurement
+                measurement = channel_data[:, id, it, x]
+
+                # Calculate position of the RX for this measurement
+                y = row_id
+                pos_x = offset_x + y * resolution
+                pos_y = offset_y + x * resolution
+
+                pos = np.array([pos_x, pos_y, pos_z], dtype=np.float64)
+                row = np.concatenate((pos, measurement), axis=0).reshape(1, -1)
+
+                rows[i, :] = row
+
+                i += 1
+
+    return rows
+
+def main():
+    parser = argparse.ArgumentParser("dataset_convert")
+    parser.add_argument(
+        "--src", help="Folder to import from", type=str, default="dataset/mat_files"
+    )
+    parser.add_argument(
+        "--dst", help="File to export to", type=str, default="dataset/data.csv"
+    )
+    parser.add_argument(
+        "--normalise", help="Whether to normalise data", type=bool, default=True
+    )
+    args = parser.parse_args()
+
+    data = load_data(args.src, args.normalise)
+
+    print(f"Exporting {data.shape[0]} rows of data")
+
+    df= pd.DataFrame(data, columns=["x", "y", "z"]+["led_"+str(i) for i in range(0, 36)])
+    df.sort_values(by=["x", "y", "z"], inplace=True)
+    df.to_csv(args.dst, index=False)
+
+    print(f"Exported data to {args.dst}")
+
+if __name__ == "__main__":
+    main()
