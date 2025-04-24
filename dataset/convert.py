@@ -88,6 +88,12 @@ def main():
     parser.add_argument(
         "--normalise", help="Whether to normalise data", type=bool, default=True
     )
+    parser.add_argument(
+        "--training_fraction", help="Fraction of training set", type=float, default=0.8
+    )
+    parser.add_argument(
+        "--seed", help="Random seed", type=int, default=42
+    )
     args = parser.parse_args()
 
     os.makedirs(args.dst, exist_ok=True)
@@ -102,11 +108,18 @@ def main():
     df = df.astype({"x": np.int16, "y": np.int16, "z": np.int16})
     df = df.astype({"led_" + str(i): np.float32 for i in range(0, 36)})
 
-    for z in tqdm(df["z"].unique(), "Exporting data"):
+    print(f"Exporting raw data to {args.dst}/data.csv")
+    df.to_csv(args.dst + "/data.csv", index=False)
+
+    for z in tqdm(df["z"].unique(), "Exporting data splits"):
         data_z = df[df["z"] == z]
         data_z = data_z.drop(columns=["z"])
 
-        data_z.to_csv(args.dst + f"/data_{z}.csv", index=False)
+        data_z_train = data_z.sample(frac=args.training_fraction, random_state=args.seed)
+        data_z_test = data_z.drop(data_z_train.index).sample(frac=1.0, random_state=args.seed) # Shuffle
+
+        data_z_train.to_csv(args.dst + f"/data_{z}_train.csv", index=False)
+        data_z_test.to_csv(args.dst + f"/data_{z}_test.csv", index=False)
 
     print(f"Exported data to {args.dst}")
 
