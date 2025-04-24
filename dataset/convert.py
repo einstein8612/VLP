@@ -83,20 +83,30 @@ def main():
         "--src", help="Folder to import from", type=str, default="dataset/mat_files"
     )
     parser.add_argument(
-        "--dst", help="File to export to", type=str, default="dataset/data.csv"
+        "--dst", help="Folder to export to", type=str, default="dataset/converted"
     )
     parser.add_argument(
         "--normalise", help="Whether to normalise data", type=bool, default=True
     )
     args = parser.parse_args()
 
+    os.makedirs(args.dst, exist_ok=True)
+
     data = load_data(args.src, args.normalise)
 
-    print(f"Exporting {data.shape[0]} rows of data")
-
+    # Load and sort the data
     df= pd.DataFrame(data, columns=["x", "y", "z"]+["led_"+str(i) for i in range(0, 36)])
     df.sort_values(by=["x", "y", "z"], inplace=True)
-    df.to_csv(args.dst, index=False)
+
+    # Assign the correct data types to the columns
+    df = df.astype({"x": np.int16, "y": np.int16, "z": np.int16})
+    df = df.astype({"led_" + str(i): np.float32 for i in range(0, 36)})
+
+    for z in tqdm(df["z"].unique(), "Exporting data"):
+        data_z = df[df["z"] == z]
+        data_z = data_z.drop(columns=["z"])
+
+        data_z.to_csv(args.dst + f"/data_{z}.csv", index=False)
 
     print(f"Exported data to {args.dst}")
 
