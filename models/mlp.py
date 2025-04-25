@@ -7,6 +7,10 @@ from dataset import FPDataset
 from models.base import BaseModel
 
 
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        torch.nn.init.xavier_uniform_(m.weight)
+
 class MLP(BaseModel):
     def __init__(self, batch_size=256, lr=0.001, epochs=100, device="cpu", seed=None):
         """
@@ -27,6 +31,8 @@ class MLP(BaseModel):
             nn.ReLU(),
             nn.Linear(256, 2),
         ).to(device)
+        self.model.apply(init_weights)
+
         self.batch_size = batch_size
         self.lr = lr
         self.epochs = epochs
