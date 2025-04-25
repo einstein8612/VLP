@@ -176,3 +176,5 @@ cython_debug/
 dataset/mat_files
 dataset/data.csv
 dataset/exported
+
+saved_runs/*
