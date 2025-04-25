@@ -6,6 +6,7 @@ from time import time
 from torch.utils.data import DataLoader
 
 import argparse
+import os
 
 task_registry = register_models()
 
@@ -34,6 +35,7 @@ def main(args):
 
         if args.save:
             print("Saving model...")
+            os.makedirs("saved_runs", exist_ok=True)
             model_path = model.save(f"saved_runs/{task}-{now}")
             print(f"Model saved to {model_path}")
 
