@@ -34,7 +34,8 @@ def main(args):
 
         if args.save:
             print("Saving model...")
-            model.save(f"saved_runs/{task}-{now}")
+            model_path = model.save(f"saved_runs/{task}-{now}")
+            print(f"Model saved to {model_path}")
 
     print("Predicting...")
     test_dataset = FPDataset(args.dataset + "/test.csv")
@@ -42,13 +43,13 @@ def main(args):
     X, y = next(iter(loader))
 
     predictions = model.predict(X)
-    print((predictions-y).abs().mean())
+    average_error = (predictions - y).abs().mean().item()
+    print("Average error:", average_error)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Experiment Runner")
     parser.add_argument("--task", type=str, required=True, help="Task name")
     parser.add_argument("--dataset", type=str, required=True, help="Dataset name")
-    parser.add_argument("--model", type=str, required=False, help="Model name")
     parser.add_argument("--save", type=bool, required=False, help="Whether to save the model", default=True)
     parser.add_argument("--load", type=str, required=False, help="Model to load")
     parser.add_argument("--seed", type=int, required=False, help="Seed for randomness", default=42)

@@ -21,11 +21,12 @@ class BaseModel:
         """
         raise NotImplementedError("Predict method not implemented.")
 
-    def save(self, model_path: str):
+    def save(self, model_path: str) -> str:
         """
         Save the model to the specified path.
 
         :param model_path: The path to save the model.
+        :return: The path where the model is saved.
         """
         raise NotImplementedError("Save method not implemented.")
 

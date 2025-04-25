@@ -50,8 +50,11 @@ class RF(BaseModel):
 
         :param model_path: The path to save the model.
         """
-        with open(model_path+".pickle", "wb") as f:
+        model_path = model_path+".pickle"
+        with open(model_path, "wb") as f:
             pickle.dump(self.model, f)
+
+        return model_path
     
     def load(model_path: str) -> "RF":
         """
