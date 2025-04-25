@@ -12,7 +12,7 @@ In order to get started we need to install the requirements
 ## Create virtual environment (Optional)
 ```bash
 $ python -m venv .venv
-source .venv/scripts/activate # .\.venv\Scripts\Activate.ps1 on Windows
+source .venv/bin/activate # .\.venv\Scripts\Activate.ps1 on Windows
 ```
 
 ## Install requirements
@@ -41,13 +41,13 @@ In the given destination folder, where the first two are a split of the data gro
 In order to test this data's efficiency at generating positions, we can run experiments with the following command:
 
 ```bash
-$ python experiment.py --task {TASK} --dataset {DATASET} --seed 42
+$ python experiment.py --task {TASK} --dataset {DATASET} --seed {SEED}
 ```
 
 ### Example (RF)
 
 ```bash
-$ python .\experiment.py --task "RF-TINY" --dataset "./dataset/exported/data_176" --seed 42
+$ python experiment.py --task "RF-TINY" --dataset "./dataset/exported/data_176" --seed 42
 # ...
 # Model saved to saved_runs/RF-TINY-1745593383.pickle
 # Average error: 24.283416141929006
@@ -58,13 +58,29 @@ $ python .\experiment.py --task "RF-TINY" --dataset "./dataset/exported/data_176
 In order to be repeatable, we can used the saved run to predict the average error again.
 
 ```bash
-$ python experiment.py --task {TASK} --dataset {DATASET} --load {SAVED_RUN} --seed 42
+$ python experiment.py --task {TASK} --dataset {DATASET} --load {SAVED_RUN} --seed {SEED}
 ```
 
 ### Example (RF)
 
 ```bash
-$ python .\experiment.py --task "RF-TINY" --dataset "./dataset/exported/data_176" --load "./saved_runs/RF-TINY-1745593383.pickle" --seed 42
+$ python experiment.py --task "RF-TINY" --dataset "./dataset/exported/data_176" --load "./saved_runs/RF-TINY-1745593383.pickle" --seed 42
+# ...
+# Average error: 24.283416141929006
+```
+
+## CUDA/ROCm
+
+If you want to use your GPU to accelerate training, then pass the device parameter as follows:
+
+```bash
+$ python experiment.py --task {TASK} --dataset {DATASET} --device {DEVICE} --seed {SEED}
+```
+
+### Example (RF)
+
+```bash
+$ python experiment.py --task "MLP" --dataset "./dataset/exported/data_176" --device "cuda:0" --seed 42
 # ...
 # Average error: 24.283416141929006
 ```

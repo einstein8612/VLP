@@ -30,7 +30,7 @@ class BaseModel:
         """
         raise NotImplementedError("Save method not implemented.")
 
-    def load(model_path: str) -> Self:
+    def load(self, model_path: str) -> Self:
         """
         Load the model from the specified path.
 

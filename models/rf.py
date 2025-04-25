@@ -9,7 +9,7 @@ from models.base import BaseModel
 
 
 class RF(BaseModel):
-    def __init__(self, n_estimators=100, max_depth=None, seed=None):
+    def __init__(self, n_estimators=100, max_depth=None, device="cpu", seed=None):
         """
         Initialize the Random Forest model.
 
@@ -56,7 +56,7 @@ class RF(BaseModel):
 
         return model_path
     
-    def load(model_path: str) -> "RF":
+    def load(self, model_path: str):
         """
         Load the model from the specified path using pickle.
 
@@ -64,7 +64,6 @@ class RF(BaseModel):
         :return: The loaded model.
         """
         with open(model_path, "rb") as f:
-            rf = RF()
-            rf.model = pickle.load(f)
-            return rf
+            self.model = pickle.load(f)
+            return
         raise ValueError(f"Model at {model_path} not loaded")

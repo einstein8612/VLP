@@ -8,7 +8,7 @@ from models.base import BaseModel
 
 
 class MLP(BaseModel):
-    def __init__(self, batch_size=256, lr=0.001, epochs=100, seed=None):
+    def __init__(self, batch_size=256, lr=0.001, epochs=100, device="cpu", seed=None):
         """
         Initialize the MLP model.
 
@@ -26,7 +26,7 @@ class MLP(BaseModel):
             nn.Linear(512, 256),
             nn.ReLU(),
             nn.Linear(256, 2),
-        )
+        ).to(device)
         self.batch_size = batch_size
         self.lr = lr
         self.epochs = epochs
@@ -62,7 +62,7 @@ class MLP(BaseModel):
         :param dataset: The dataset to predict on.
         :return: The predictions.
         """
-
+        self.model.eval()
         return self.model.forward(X)
 
     def save(self, model_path: str):
@@ -75,7 +75,7 @@ class MLP(BaseModel):
         torch.save(self.model.state_dict(), model_path)
         return model_path
 
-    def load(model_path: str) -> "MLP":
+    def load(self, model_path: str):
         """
         Load the model from the specified path using pickle.
 
@@ -83,7 +83,6 @@ class MLP(BaseModel):
         :return: The loaded model.
         """
         with open(model_path, "rb") as f:
-            mlp = MLP()
-            mlp.model.load_state_dict(torch.load(f))
-            return mlp
+            self.model.load_state_dict(torch.load(f))
+            return
         raise ValueError(f"Model at {model_path} not loaded")
