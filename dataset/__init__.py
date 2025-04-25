@@ -15,3 +15,5 @@ class FPDataset(Dataset):
         xy = self.xy[idx]
         leds = self.leds[idx]
         return leds, xy
+
+__all__ = ["FPDataset"]

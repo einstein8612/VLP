@@ -30,8 +30,8 @@ python ./dataset/convert.py --src "./dataset/mat_files" --dst "./dataset/exporte
 
 This will generate the files
 
-- `data_{z}_train.csv`
-- `data_{z}_test.csv`
-- `data.csv`
+- `{dst}/data_{z}/train.csv`
+- `{dst}/data_{z}/test.csv`
+- `{dst}/data.csv`
 
 In the given destination folder, where the first two are a split of the data grouped by z-pos, and the last is all the data in one CSV.

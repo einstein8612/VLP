@@ -118,8 +118,10 @@ def main():
         data_z_train = data_z.sample(frac=args.training_fraction, random_state=args.seed)
         data_z_test = data_z.drop(data_z_train.index).sample(frac=1.0, random_state=args.seed) # Shuffle
 
-        data_z_train.to_csv(args.dst + f"/data_{z}_train.csv", index=False)
-        data_z_test.to_csv(args.dst + f"/data_{z}_test.csv", index=False)
+        os.makedirs(args.dst + f"/data_{z}", exist_ok=True) # Make directory for each z
+
+        data_z_train.to_csv(args.dst + f"/data_{z}/train.csv", index=False)
+        data_z_test.to_csv(args.dst + f"/data_{z}/test.csv", index=False)
 
     print(f"Exported data to {args.dst}")
 
