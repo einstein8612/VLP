@@ -12,7 +12,7 @@ def init_weights(m):
         torch.nn.init.xavier_uniform_(m.weight)
 
 class MLP(BaseModel):
-    def __init__(self, batch_size=256, lr=0.001, epochs=100, device="cpu", seed=None):
+    def __init__(self, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
         """
         Initialize the MLP model.
 
@@ -21,14 +21,19 @@ class MLP(BaseModel):
         self.model = nn.Sequential(
             nn.Linear(36, 256),
             nn.ReLU(),
+
             nn.Linear(256, 512),
             nn.ReLU(),
+
             nn.Linear(512, 1024),
             nn.ReLU(),
+
             nn.Linear(1024, 512),
             nn.ReLU(),
+
             nn.Linear(512, 256),
             nn.ReLU(),
+
             nn.Linear(256, 2),
         ).to(device)
         self.model.apply(init_weights)

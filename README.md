@@ -82,5 +82,5 @@ $ python experiment.py --task {TASK} --dataset {DATASET} --device {DEVICE} --see
 ```bash
 $ python experiment.py --task "MLP" --dataset "./dataset/exported/data_176" --device "cuda:0" --seed 42
 # ...
-# Average error: 24.283416141929006
+# Average error: 6.804797172546387
 ```
