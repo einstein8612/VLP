@@ -2,8 +2,6 @@ import argparse
 import os
 
 import numpy as np
-import numpy.typing as npt
-from scipy.io import loadmat
 from tqdm import tqdm
 
 import pandas as pd
