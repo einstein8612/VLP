@@ -56,11 +56,11 @@ def main():
         matrix = np.zeros((y_size, x_size, led_size))
         for i, led in enumerate(leds):
             matrix[df["y"],df["x"], i] = df[led]
-        
+
         np.save(args.dst+f"/heatmap_{z}/raw.npy", matrix)
 
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
-            plt.imshow(matrix[:, :, i], interpolation='nearest')
+            plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')
             plt.colorbar()
             plt.savefig(args.dst+f"/heatmap_{z}/led_{i}.png")
             plt.clf()
