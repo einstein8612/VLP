@@ -89,7 +89,7 @@ If you want to use your GPU to accelerate training, then pass the device paramet
 $ python experiment.py --task {TASK} --dataset {DATASET} --device {DEVICE} --seed {SEED}
 ```
 
-### Example (RF)
+### Example (MLP)
 
 ```bash
 $ python experiment.py --task "MLP" --dataset "./dataset/exported/data_176" --device "cuda:0" --seed 42
