@@ -178,3 +178,5 @@ dataset/data.csv
 dataset/exported
 
 saved_runs/*
+
+heatmaps

@@ -1,0 +1,71 @@
+import argparse
+import os
+
+import numpy as np
+import numpy.typing as npt
+from scipy.io import loadmat
+from tqdm import tqdm
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+def main():
+    parser = argparse.ArgumentParser("dataset_heatmap")
+    parser.add_argument(
+        "--src", help="File to import from", type=str, default="dataset/exported/data.csv"
+    )
+    parser.add_argument(
+        "--dst", help="Folder to export to", type=str, default="dataset/heatmaps"
+    )
+    parser.add_argument(
+        "--normalise", help="Whether to normalise data", type=bool, default=True
+    )
+    args = parser.parse_args()
+
+    os.makedirs(args.dst, exist_ok=True)
+
+    df = pd.read_csv(args.src)
+    
+    # Change x and y into matrix coordinates
+    df["x"] = df["x"]-df["x"].min()
+    df["y"] = df["y"]-df["y"].min()
+    
+    df["x"] = df["x"] / 10
+    df["y"] = df["y"] / 10
+    
+    # Mean the different samples
+    df = df.groupby(["x","y","z"]).mean().reset_index()
+
+    # Fix types
+    df = df.astype({"x": np.int16, "y": np.int16})
+
+    for z in df["z"].unique():
+        data_z = df[df["z"] == z]
+        data_z = data_z.drop(columns=["z"])
+
+        os.makedirs(args.dst + f"/heatmap_{z}", exist_ok=True) # Make directory for each z
+
+        # Construct matrix for heatmaps
+        y_size = data_z["y"].max()+1
+        x_size = data_z["x"].max()+1
+        leds = data_z.columns.difference(["x","y"])
+        leds = sorted(leds, key=lambda x: int(x.split('_')[1]))
+        led_size = len(leds)
+        
+        matrix = np.zeros((y_size, x_size, led_size))
+        for i, led in enumerate(leds):
+            matrix[df["y"],df["x"], i] = df[led]
+        
+        np.save(args.dst+f"/heatmap_{z}/raw.npy", matrix)
+
+        for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
+            plt.imshow(matrix[:, :, i], interpolation='nearest')
+            plt.colorbar()
+            plt.savefig(args.dst+f"/heatmap_{z}/led_{i}.png")
+            plt.clf()
+
+    print(f"Exported heatmaps to {args.dst}")
+
+if __name__ == "__main__":
+    main()

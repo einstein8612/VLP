@@ -25,7 +25,7 @@ $ pip install -r requirements.txt
 To get started aqcuire the `mat_files` folder and store them in the dataset folder. Afterwards, run the script to translate them into a PyTorch set
 
 ```bash
-$ python ./dataset/convert.py --src "./dataset/mat_files" --dst "./dataset/exported" --normalise true --training_fraction 0.8 --seed 42
+$ python dataset/convert.py --src "./dataset/mat_files" --dst "./dataset/exported" --normalise true --training_fraction 0.8 --seed 42
 ```
 
 This will generate the files
@@ -35,6 +35,18 @@ This will generate the files
 - `{dst}/data.csv`
 
 In the given destination folder, where the first two are a split of the data grouped by z-pos, and the last is all the data in one CSV.
+
+## Generate heat maps
+
+In order to understand the quality of your cleaning solution or data augmentation solution, you can generate a heatmaps for every LED. Here every heatmap corresponds to the mean of all the values that are associated with that specific (x,y) coordinate.
+
+```bash
+$ python dataset/heatmap.py --src "./dataset/exported/data.csv" --dst "./dataset/heatmaps"
+```
+
+An example of such a heatmap is given here, for the non-cleaned data of LED 16 at `z=176`.
+
+![LED 16 Heatmap](./assets/readme/led_16_heatmap.png)
 
 ## Run experiment (Training)
 
