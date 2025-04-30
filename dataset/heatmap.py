@@ -17,7 +17,7 @@ def main():
         "--dst", help="Folder to export to", type=str, default="dataset/heatmaps"
     )
     parser.add_argument(
-        "--normalise", help="Whether to normalise data", type=bool, default=True
+        "--imgs", help="Whether to create images", type=bool, default=False
     )
     args = parser.parse_args()
 
@@ -56,6 +56,9 @@ def main():
             matrix[df["y"],df["x"], i] = df[led]
 
         np.save(args.dst+f"/heatmap_{z}/raw.npy", matrix)
+
+        if not args.imgs:
+            continue
 
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
             plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')

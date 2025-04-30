@@ -40,8 +40,10 @@ In the given destination folder, where the first two are a split of the data gro
 
 In order to understand the quality of your cleaning solution or data augmentation solution, you can generate a heatmaps for every LED. Here every heatmap corresponds to the mean of all the values that are associated with that specific (x,y) coordinate.
 
+This is also a necessary step if you want to clean or augment the data.
+
 ```bash
-$ python dataset/heatmap.py --src "./dataset/exported/data.csv" --dst "./dataset/heatmaps"
+$ python dataset/heatmap.py --src "./dataset/exported/data.csv" --dst "./dataset/heatmaps" --imgs true
 ```
 
 An example of such a heatmap is given here, for the non-cleaned data of LED 16 at `z=176`.
