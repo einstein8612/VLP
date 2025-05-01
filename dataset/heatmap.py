@@ -51,7 +51,7 @@ def main():
         leds = sorted(leds, key=lambda x: int(x.split('_')[1]))
         led_size = len(leds)
         
-        matrix = np.zeros((y_size, x_size, led_size))
+        matrix = -np.ones((y_size, x_size, led_size)) # Initialize with -1 to indicate no data
         for i, led in enumerate(leds):
             matrix[df["y"],df["x"], i] = df[led]
 
@@ -61,6 +61,8 @@ def main():
             continue
 
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
+            matrix[:, :, i] = np.clip(matrix[:, :, i], 0, None) # Clip negative values to 0
+
             plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')
             plt.colorbar()
             plt.savefig(args.dst+f"/heatmap_{z}/led_{i}.png")
