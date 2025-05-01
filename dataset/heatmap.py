@@ -60,9 +60,8 @@ def main():
         if not args.imgs:
             continue
 
+        matrix = np.clip(matrix, 0, None) # Clip negative values to 0
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
-            matrix[:, :, i] = np.clip(matrix[:, :, i], 0, None) # Clip negative values to 0
-
             plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')
             plt.colorbar()
             plt.savefig(args.dst+f"/heatmap_{z}/led_{i}.png")
