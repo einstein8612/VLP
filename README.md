@@ -50,6 +50,37 @@ An example of such a heatmap is given here, for the non-cleaned data of LED 16 a
 
 ![LED 16 Heatmap](./assets/readme/led_16_heatmap.png)
 
+## Clean data
+
+Afterwards, you can clean the data generated in the heatmaps with any of the following four, at the time of writing, strategies:
+
+- MEAN
+- IDW (Inverse Distance Weighing)
+- LAMBERTIAN
+- LAMBERTIAN-IDW (Inverse Distance Weighing)
+
+It should be clear what they do: they replace invalid or noisy points using different methods. These include the mean of the nearest valid points, the inverse distance weighted sum of the nearest valid points, an estimated RSS based on the Lambertian model of the closest valid point, and an estimated RSS using the Lambertian model for the nearest valid points, weighted by their inverse distance.
+
+In order to run them use the following command:
+
+```bash
+python dataset/clean.py --src {SRC} --dst {DST} --strategy {STRATEGY} --imgs {IMGS}
+```
+
+### Example (Lambertian IDW)
+
+```bash
+python dataset/clean.py --src "dataset/heatmaps/heatmap_176/raw.npy" --dst "dataset/heatmaps/heatmap_176" --strategy LAMBERTIAN-IDW --imgs true
+```
+
+Afterwards, your heatmaps will have been cleaned and images are stored in the destination folder under the name `led_{i}_cleaned_{STRATEGY}.png`
+
+Again, an example of such a heatmap is given here for LED 16.
+
+![LED 16 Cleaned Heatmap](./assets/readme/led_16_cleaned_heatmap.png)
+
+**Note**: In the actual output images, the raw version will not be plotted. This is simply to showcase the cleaning process, the actual output will be just the right sub-figure.
+
 ## Run experiment (Training)
 
 In order to test this data's efficiency at generating positions, we can run experiments with the following command:

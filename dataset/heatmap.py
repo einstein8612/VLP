@@ -64,6 +64,7 @@ def main():
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
             plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')
             plt.colorbar()
+            plt.title(f"Raw Data for LED {i}")
             plt.savefig(args.dst+f"/heatmap_{z}/led_{i}.png")
             plt.clf()
 

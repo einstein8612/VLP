@@ -150,7 +150,7 @@ def main():
                 reconstructed_rss = reconstruct_rss_lambertian(rss_values, d1, d2, m)  # shape: (k,)
                 data_i[y_bad, x_bad] = np.sum(reconstructed_rss * weights)
     
-    print("Exporting cleaned data")
+    print(f"Exporting cleaned data to {args.dst}/cleaned_{args.strategy}.npy")
     np.save(args.dst + f"/cleaned_{args.strategy}.npy", data)
 
     if not args.imgs:
