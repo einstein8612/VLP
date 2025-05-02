@@ -31,13 +31,15 @@ def generate_score_matrix(data: npt.NDArray, r=1):
     clipped_data = np.clip(data, 0, None)  # Ensure no negative values for convolution
 
     # Apply convolution
-    score_matrix = convolve(clipped_data, kernel, mode='constant', cval=0.0, axes=(0, 1))
+    refs_sum = convolve(clipped_data, kernel, mode='constant', cval=0.0, axes=(0, 1))
     count_neighbors = convolve(valid_mask, kernel, mode='constant', cval=0.0, axes=(0, 1))
 
-    score_matrix = np.divide(score_matrix, count_neighbors)
-    score_matrix[valid_mask == 0] = 0 # Set invalid points to 0
+    # We only divide by count_neighbors where it is valid
+    refs_mean = np.divide(refs_sum, count_neighbors, where=valid_mask != 0)
+    refs_mean[valid_mask == 0] = 0 # Set invalid points to 0
 
-    return np.abs(clipped_data - score_matrix)
+    score_matrix = np.abs(clipped_data - refs_mean)
+    return score_matrix
 
 def reconstruct_rss_lambertian(rss_ref, d1, d2, m):
     """ Reconstructs RSS at d1 using known RSS at d2 with Lambertian model. """
