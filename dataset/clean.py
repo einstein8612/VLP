@@ -6,6 +6,7 @@ import numpy.typing as npt
 from scipy.ndimage import convolve
 from scipy.spatial import cKDTree
 from tqdm import tqdm
+import os
 
 score_threshold = 0.05  # Threshold for score matrix to consider a point bad
 
@@ -39,7 +40,6 @@ def generate_score_matrix(data: npt.NDArray, r=1):
     refs_mean[valid_mask == 0] = 0 # Set invalid points to 0
 
     bias = (1 / (refs_mean + 1e-6)) ** 0.25
-    bias = 1
 
     score_matrix = np.abs(clipped_data - refs_mean) * bias
     return score_matrix
@@ -156,6 +156,9 @@ def main():
                 data_i[y_bad, x_bad] = np.sum(reconstructed_rss * weights)
     
     print(f"Exporting cleaned data to {args.dst}/cleaned_{args.strategy}.npy")
+
+    os.makedirs(args.dst, exist_ok=True)
+
     np.save(args.dst + f"/cleaned_{args.strategy}.npy", data)
 
     if not args.imgs:
