@@ -64,13 +64,13 @@ It should be clear what they do: they replace invalid or noisy points using diff
 In order to run them use the following command:
 
 ```bash
-python dataset/clean.py --src {SRC} --dst {DST} --strategy {STRATEGY} --imgs {IMGS}
+$ python dataset/clean.py --src {SRC} --dst {DST} --strategy {STRATEGY} --imgs {IMGS}
 ```
 
 ### Example (Lambertian IDW)
 
 ```bash
-python dataset/clean.py --src "dataset/heatmaps/heatmap_176/raw.npy" --dst "dataset/heatmaps/heatmap_176" --strategy LAMBERTIAN-IDW --imgs true
+$ python dataset/clean.py --src "dataset/heatmaps/heatmap_176/raw.npy" --dst "dataset/heatmaps/heatmap_176" --strategy LAMBERTIAN-IDW --imgs true
 ```
 
 Afterwards, your heatmaps will have been cleaned and images are stored in the destination folder under the name `led_{i}_cleaned_{STRATEGY}.png`
@@ -80,6 +80,13 @@ Again, an example of such a heatmap is given here for LED 16.
 ![LED 16 Cleaned Heatmap](./assets/readme/led_16_cleaned_heatmap.png)
 
 **Note**: In the actual output images, the raw version will not be plotted. This is simply to showcase the cleaning process, the actual output will be just the right sub-figure.
+
+## Heatmaps to datasets
+
+In order to use cleaned and/or augmented heatmaps in an experiment you need to turn it into a dataset. You can do this by running the following command:
+```bash
+$ python dataset/heatmap_to_dataset.py --src "dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" --dst "dataset/exported/data_176_cleaned" --seed 42
+```
 
 ## Run experiment (Training)
 

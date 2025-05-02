@@ -38,7 +38,10 @@ def generate_score_matrix(data: npt.NDArray, r=1):
     refs_mean = np.divide(refs_sum, count_neighbors, where=valid_mask != 0)
     refs_mean[valid_mask == 0] = 0 # Set invalid points to 0
 
-    score_matrix = np.abs(clipped_data - refs_mean)
+    bias = (1 / (refs_mean + 1e-6)) ** 0.25
+    bias = 1
+
+    score_matrix = np.abs(clipped_data - refs_mean) * bias
     return score_matrix
 
 def reconstruct_rss_lambertian(rss_ref, d1, d2, m):
