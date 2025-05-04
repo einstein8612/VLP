@@ -8,7 +8,7 @@ from scipy.spatial import cKDTree
 from tqdm import tqdm
 import os
 
-score_threshold = 0.05  # Threshold for score matrix to consider a point bad
+score_threshold = 0.04  # Threshold for score matrix to consider a point bad
 
 def get_tx_positions():
     ##Actual position of the TX (roughly measured)
@@ -19,7 +19,7 @@ def get_tx_positions():
             [230, 2170, 1920], [720, 2225, 1835], [1235, 2170, 1920], [1720, 2170, 1920], [2220, 2225, 1835], [2710, 2170, 1920],
             [215, 2670, 1920], [715, 2670, 1920], [1245, 2670, 1920], [1730, 2670, 1920], [2245, 2670, 1920], [2730, 2670, 1920]]
 
-def generate_score_matrix(data: npt.NDArray, r=1):
+def generate_score_matrix(data: npt.NDArray, r=1, bias=0.25) -> npt.NDArray:
     # Create a mask for valid data points
     valid_mask = np.ones_like(data, dtype=float)
     valid_mask[data == -1] = 0
@@ -39,9 +39,9 @@ def generate_score_matrix(data: npt.NDArray, r=1):
     refs_mean = np.divide(refs_sum, count_neighbors, where=valid_mask != 0)
     refs_mean[valid_mask == 0] = 0 # Set invalid points to 0
 
-    bias = (1 / (refs_mean + 1e-6)) ** 0.25
+    bias_coef = (1 / (refs_mean + 1e-10)) ** bias
 
-    score_matrix = np.abs(clipped_data - refs_mean) * bias
+    score_matrix = np.abs(clipped_data - refs_mean) * bias_coef
     return score_matrix
 
 def reconstruct_rss_lambertian(rss_ref, d1, d2, m):
