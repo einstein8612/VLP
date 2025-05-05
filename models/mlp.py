@@ -62,6 +62,7 @@ class MLP(BaseModel):
             for X, y in loader:
                 optimizer.zero_grad()
                 outputs = self.model(X)
+                # loss = (torch.norm(outputs - y.float(), dim=1)**2).mean()
                 loss = criterion(outputs, y.float())
                 loss.backward()
                 optimizer.step()
