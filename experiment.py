@@ -3,6 +3,7 @@ from dataset import FPDataset
 
 from time import time
 
+import torch
 from torch.utils.data import DataLoader
 
 import argparse
@@ -45,7 +46,7 @@ def main(args):
     X, y = next(iter(loader))
 
     predictions = model.predict(X)
-    average_error = (predictions - y).abs().mean().item()
+    average_error = torch.norm(predictions - y, dim=1).mean().item()
     print("Average error:", average_error)
 
 if __name__ == "__main__":
