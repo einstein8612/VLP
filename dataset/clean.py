@@ -45,7 +45,26 @@ def generate_score_matrix(data: npt.NDArray, r=1, bias=0.25) -> npt.NDArray:
     return score_matrix
 
 def reconstruct_rss_lambertian(rss_ref, d1, d2, m):
-    """ Reconstructs RSS at d1 using known RSS at d2 with Lambertian model. """
+    """
+    Reconstructs RSS at d1 using known RSS at d2 with Lambertian model.
+
+    rss_ref: RSS value at d2
+    d1: Distance from LED to the point to reconstruct (bad point)
+    d2: Distance from LED to the reference point (good point)
+    m: Lambertian exponent (calculated from the LED positions)
+
+    Small proof, assuming $$ A(d_i) \propto \frac{1}{d_i^2} $$ for i in {1,2}:
+    $$
+        \frac{I_1^r}{I_2^r} = \frac{A(d_1)}{A(d_2)}\left[\frac{\cos(\phi_1)}{\cos(\phi_2)}\right]^{m+1}
+    $$
+    $$
+        \frac{I_1^r}{I_2^r} = \frac{a \cdot d_1^{-2}}{a \cdot d_2^{-2}}\left[\frac{\frac{h}{d_1}}{\frac{h}{d_2}}\right]^{m+1} = \frac{d_2^2}{d_1^2}\left[\frac{d_2}{d_1}\right]^{m+1} = \left[\frac{d_2}{d_1}\right]^{m+3}
+    $$
+    $$
+        \frac{I_1^r}{I_2^r} = \left[\frac{d_2}{d_1}\right]^{m+3} \implies I_1^r = I_2^r \cdot \left[\frac{d_2}{d_1}\right]^{m+3}
+    $$
+    """
+    
     exponent = m + 3
     return rss_ref * (d2 / d1) ** exponent
 
