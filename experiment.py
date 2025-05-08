@@ -12,6 +12,8 @@ import os
 task_registry = register_models()
 
 def main(args):
+    torch.manual_seed(args.seed)
+
     task = args.task
     tasks = task_registry.get_task_names()
     if task not in tasks:

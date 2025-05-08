@@ -31,12 +31,13 @@ def main():
     
     df["x"] = df["x"] / 10
     df["y"] = df["y"] / 10
-    
-    # Mean the different samples
-    df = df.groupby(["x","y","z"]).mean().reset_index()
 
     # Fix types
     df = df.astype({"x": np.int16, "y": np.int16})
+
+    # Add iteration column to distinguish between different measurements
+    df["iter"] = df.groupby(["x", "y", "z"]).cumcount()
+    no_iter = df["iter"].max() + 1
 
     for z in df["z"].unique():
         data_z = df[df["z"] == z]
@@ -47,20 +48,22 @@ def main():
         # Construct matrix for heatmaps
         y_size = data_z["y"].max()+1
         x_size = data_z["x"].max()+1
-        leds = data_z.columns.difference(["x","y"])
+        leds = data_z.columns.difference(["x","y","iter"])
         leds = sorted(leds, key=lambda x: int(x.split('_')[1]))
         led_size = len(leds)
         
-        matrix = -np.ones((y_size, x_size, led_size)) # Initialize with -1 to indicate no data
+        matrix = -np.ones((y_size, x_size, led_size, no_iter)) # Initialize with -1 to indicate no data
         for i, led in enumerate(leds):
-            matrix[df["y"],df["x"], i] = df[led]
+            matrix[df["y"],df["x"], i, df["iter"]] = df[led]
 
         np.save(args.dst+f"/heatmap_{z}/raw.npy", matrix)
 
         if not args.imgs:
             continue
 
+        matrix = np.mean(matrix, axis=3) # Create images using mean
         matrix = np.clip(matrix, 0, None) # Clip negative values to 0
+
         for i in tqdm(range(matrix.shape[2]), f"Exporting heat maps for z={z}"):
             plt.imshow(matrix[:, :, i], interpolation='nearest', origin='lower')
             plt.colorbar()

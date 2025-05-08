@@ -78,20 +78,24 @@ def main():
 
     # Generate the score matrices
     score_matrix = generate_score_matrix(data, r=2)
+    best_score_idx = score_matrix.argmin(axis=3)  # shape (y, x, led)
+    best_scores = np.take_along_axis(score_matrix, best_score_idx[..., np.newaxis], axis=3).squeeze(axis=3) # ...
+    best_data = np.take_along_axis(data, best_score_idx[..., np.newaxis], axis=3).squeeze(axis=3) # ...
 
     if "LAMBERTIAN" in args.strategy:
         leds = get_tx_positions()
         m = - np.log(2) / np.log(np.cos(np.pi / 12))
 
-    h, w, _ = score_matrix.shape
+    h, w, no_leds = best_scores.shape
+    
     yy, xx = np.meshgrid(np.arange(h), np.arange(w), indexing='ij')
     coords = np.stack((yy.ravel(), xx.ravel()), axis=-1)
-    for i in tqdm(range(score_matrix.shape[2]), "Cleaning data for LEDs"):
+    for i in tqdm(range(no_leds), "Cleaning data for LEDs"):
         # Select the data and score matrix for the current LED
-        data_i = data[:, :, i]
-        score_matrix_i = score_matrix[:, :, i]
+        data_i = best_data[:, :, i]
+        best_scores_i = best_scores[:, :, i]
 
-        bad = score_matrix_i > score_threshold
+        bad = best_scores_i > score_threshold
         good = ~bad & (data_i != -1) # Good points are those that are not bad and have data
 
         good_coords = coords[good.ravel()]
@@ -159,14 +163,14 @@ def main():
 
     os.makedirs(args.dst, exist_ok=True)
 
-    np.save(args.dst + f"/cleaned_{args.strategy}.npy", data)
+    np.save(args.dst + f"/cleaned_{args.strategy}.npy", best_data)
 
     if not args.imgs:
         return
 
-    data = np.clip(data, 0, None) # Clip negative values to 0
-    for i in tqdm(range(data.shape[2]), "Exporting heat maps for cleaned data"):
-        plt.imshow(data[:, :, i], interpolation='nearest', origin='lower')
+    best_data = np.clip(best_data, 0, None) # Clip negative values to 0
+    for i in tqdm(range(no_leds), "Exporting heat maps for cleaned data"):
+        plt.imshow(best_data[:, :, i], interpolation='nearest', origin='lower')
         plt.colorbar()
         plt.title(f"Cleaned Data for LED {i} ({args.strategy})")
         plt.savefig(args.dst + f"/led_{i}_cleaned_{args.strategy}.png")
