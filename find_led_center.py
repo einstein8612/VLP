@@ -154,7 +154,7 @@ def main():
     if not args.imgs:
         return
     # Show all the LED positions on a single plot
-    plt.imshow(np.zeros_like(data[:, :, 0]), origin="lower")
+    plt.imshow(data.max(axis=2)**4, origin="lower")
     plt.scatter([pos[0] for pos in led_positions], [pos[1] for pos in led_positions], c="red", s=1)
     plt.scatter([pos[0]/10 for pos in get_tx_positions()], [pos[1]/10 for pos in get_tx_positions()], c="blue", s=1)
     plt.title("LED Positions")
