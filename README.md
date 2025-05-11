@@ -50,6 +50,20 @@ An example of such a heatmap is given here, for the non-cleaned data of LED 16 a
 
 ![LED 16 Heatmap](./assets/readme/led_16_heatmap.png)
 
+## TX Position extraction (Optional)
+
+In order to make better use of cleaning and augmenting down the line, you may choose to estimate your TX locations through your data itself. It does this through a simple circle fitting method called [r3fit](https://github.com/einstein8612/r3fit/). In order to run this method, you can sue the following command:
+
+```bash
+$ python find_led_center.py --src "./dataset/heatmaps/heatmap_176/raw.npy" --min_sample 0.395 --max_sample 0.405 --imgs true
+```
+
+Here `min_sample` and `max_sample` decide which points are part of the circle to fit, essentially it means the thickness of the points to fit on. This command will output your estimated TX positions at `./leds/led_positions.json`. It will also optionally output images when you specify it. Here is an example:
+
+![Fitted LED 18](./assets/readme/led_18_circle_fit.png)
+
+You can clearly see the [r3fit](https://github.com/einstein8612/r3fit/) being much more noise resistant than Kasa, hence chosing it.
+
 ## Clean data
 
 Afterwards, you can clean the data generated in the heatmaps with any of the following four, at the time of writing, strategies:
