@@ -45,7 +45,7 @@ def generate_score_matrix(data: npt.NDArray, r=1, bias=0.25) -> npt.NDArray:
     return score_matrix
 
 def reconstruct_rss_lambertian(rss_ref, d1, d2, m):
-    """
+    r"""
     Reconstructs RSS at d1 using known RSS at d2 with Lambertian model.
 
     rss_ref: RSS value at d2
