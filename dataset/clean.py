@@ -73,7 +73,7 @@ strategies = ["MEAN", "IDW", "LAMBERTIAN", "LAMBERTIAN-IDW"]
 def main():
     parser = argparse.ArgumentParser("dataset_clean")
     parser.add_argument(
-        "--src", help="Heatmap rank-3 tensor to clean", type=str, default="dataset/heatmaps/heatmap_176/raw.npy"
+        "--src", help="Heatmap rank-4 tensor to clean", type=str, default="dataset/heatmaps/heatmap_176/raw.npy"
     )
     parser.add_argument(
         "--dst", help="Folder to export to", type=str, default="dataset/heatmaps/heatmap_176"
