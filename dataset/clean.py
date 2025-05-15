@@ -105,11 +105,11 @@ def main():
         leds = get_tx_positions()
         m = - np.log(2) / np.log(np.cos(np.pi / 12))
 
-    h, w, no_leds = best_scores.shape
+    h, w, leds_n = best_scores.shape
     
     yy, xx = np.meshgrid(np.arange(h), np.arange(w), indexing='ij')
     coords = np.stack((yy.ravel(), xx.ravel()), axis=-1)
-    for i in tqdm(range(no_leds), "Cleaning data for LEDs"):
+    for i in tqdm(range(leds_n), "Cleaning data for LEDs"):
         # Select the data and score matrix for the current LED
         data_i = best_data[:, :, i]
         best_scores_i = best_scores[:, :, i]
@@ -188,7 +188,7 @@ def main():
         return
 
     best_data = np.clip(best_data, 0, None) # Clip negative values to 0
-    for i in tqdm(range(no_leds), "Exporting heat maps for cleaned data"):
+    for i in tqdm(range(leds_n), "Exporting heat maps for cleaned data"):
         plt.imshow(best_data[:, :, i], interpolation='nearest', origin='lower')
         plt.colorbar()
         plt.title(f"Cleaned Data for LED {i} ({args.strategy})")
