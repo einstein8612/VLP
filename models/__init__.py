@@ -13,5 +13,7 @@ def register_models() -> TaskRegistry:
     task_registry.register("RF", RF)
     task_registry.register("RF-TINY", RF, n_estimators=6, max_depth=10)
     task_registry.register("MLP", MLP)
+    task_registry.register("MLP-TINY", MLP, epochs=25)
+    task_registry.register("MLP-TINY-NORMALISE", MLP, epochs=25, normalize=True)
     
     return task_registry

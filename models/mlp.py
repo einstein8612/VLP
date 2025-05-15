@@ -10,9 +10,14 @@ from models.base import BaseModel
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
+        
+
+class NormalizeInput(nn.Module):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x / (x.norm(dim=1, keepdim=True) + 1e-8)
 
 class MLP(BaseModel):
-    def __init__(self, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
+    def __init__(self, batch_size=256, lr=0.001, epochs=250, normalize=False, device="cpu", seed=None):
         """
         Initialize the MLP model.
 
@@ -36,6 +41,11 @@ class MLP(BaseModel):
 
             nn.Linear(256, 2),
         ).to(device)
+
+        # Normalize input if necessary        
+        if normalize:
+            self.model.insert(0, NormalizeInput())
+
         self.model.apply(init_weights)
 
         self.batch_size = batch_size
