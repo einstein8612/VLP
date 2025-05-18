@@ -95,6 +95,20 @@ Again, an example of such a heatmap is given here for LED 16.
 
 **Note**: In the actual output images, the raw version will not be plotted. This is simply to showcase the cleaning process, the actual output will be just the right sub-figure.
 
+## Age data
+
+In order to evaluate how well the model will perform after data ages and LEDs get replaced etc, we need a way to simulate aged data.
+
+In this repository we provide this with the following command:
+```bash
+$ python dataset/led_age_simulation.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --min_age 0 --max_age 100000 --r90_hours 33000 --imgs true
+```
+
+This constructs an aged heatmap, but uses random ages as specified by the range and the seed. In order to have fine-tuned control, you may overwrite these ages by using the ``--ages`` argument. The following is an example:
+```bash
+python dataset/led_age_simulation.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --ages 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 --r90_hours 33000 --imgs true
+```
+
 ## Heatmaps to datasets
 
 In order to use cleaned and/or augmented heatmaps in an experiment you need to turn it into a dataset. You can do this by running the following command:

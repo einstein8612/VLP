@@ -2,9 +2,6 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-import numpy.typing as npt
-from scipy.ndimage import convolve
-from scipy.spatial import cKDTree
 from tqdm import tqdm
 import os
 import json
@@ -84,7 +81,7 @@ def main():
     data = np.load(args.src)
     leds_n = data.shape[2]
     
-    if args.ages == None:
+    if args.ages is None:
         args.ages = rng.integers(args.min_age, args.max_age, leds_n)
     else:
         args.ages = np.array(args.ages)
@@ -109,8 +106,8 @@ def main():
 
     os.makedirs(args.dst, exist_ok=True)
 
-    np.save(args.dst + f"/aged.npy", aged_data)
-    json.dump(led_ages, open(args.dst + f"/ages.json", "w"))
+    np.save(args.dst + "/aged.npy", aged_data)
+    json.dump(led_ages, open(args.dst + "/ages.json", "w"))
 
     if not args.imgs:
         return
