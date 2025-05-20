@@ -2,6 +2,7 @@ from utils.task_registry import TaskRegistry
 
 from .rf import RF
 from .mlp import MLP
+from .mlp_online import MLPOnline
 
 def register_models() -> TaskRegistry:
     """
@@ -15,5 +16,6 @@ def register_models() -> TaskRegistry:
     task_registry.register("MLP", MLP)
     task_registry.register("MLP-TINY", MLP, epochs=25)
     task_registry.register("MLP-TINY-NORMALISE", MLP, epochs=25, normalize=True)
+    task_registry.register("MLP-ONLINE-TINY", MLPOnline, epochs=25)
     
     return task_registry
