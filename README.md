@@ -109,6 +109,12 @@ This constructs an aged heatmap, but uses random ages as specified by the range 
 python dataset/led_age_simulation.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --ages 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 --r90_hours 33000 --imgs true
 ```
 
+You can also generate a time-series of data points, which can simulate the model receiving data as the LEDs are aging. This allows for a more finetuned response to the LED degradation problem. You can use the following command to generate this dataset:
+
+```bash
+$ python dataset/led_age_series.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/exported/age-series --timestep 100 --time 50000
+```
+
 ## Heatmaps to datasets
 
 In order to use cleaned and/or augmented heatmaps in an experiment you need to turn it into a dataset. You can do this by running the following command:
