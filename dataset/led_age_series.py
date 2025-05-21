@@ -67,6 +67,9 @@ def main():
         "--timestep", help="Timestep size", type=int, required=True, default=1000
     )
     parser.add_argument(
+        "--flickering_prob", help="Probability of flickering", type=float, default=0.001
+    )
+    parser.add_argument(
         "--imgs", help="Whether to create images", type=bool, default=False
     )
     parser.add_argument(
@@ -114,6 +117,11 @@ def main():
     # Age the samples
     samples = flat_data[sample_flat_idxs, led_ids] # Get the samples for each LED at each timestep with the same sample index. Shape (timesteps, samples_per_timestep, leds_n)
     aged_samples = samples * relative_decay[:, None, :] # Apply the relative decay to the samples
+    
+    flickering = rng.choice([0, 1], size=aged_samples.shape, p=[args.flickering_prob, 1 - args.flickering_prob])
+    aged_samples = aged_samples * flickering # Apply flickering to the samples
+    
+    print(f"Simulated {(1-flickering).sum()} LEDs flickering")
 
      # Reshape to (timesteps * samples_per_timestep, leds_n), C-style row-major order so that the first axis is the slowest changing axis
     reshaped = aged_samples.reshape(-1, samples.shape[2]) # Shape (timesteps * samples_per_timestep, leds_n)
