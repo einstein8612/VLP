@@ -101,18 +101,18 @@ In order to evaluate how well the model will perform after data ages and LEDs ge
 
 In this repository we provide this with the following command:
 ```bash
-$ python dataset/led_age_simulation.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --min_age 0 --max_age 100000 --r90_hours 33000 --imgs true
+$ python dataset/led_age_simulation.py --src "./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --min_age 0 --max_age 100000 --r90_hours 33000 --imgs true
 ```
 
 This constructs an aged heatmap, but uses random ages as specified by the range and the seed. In order to have fine-tuned control, you may overwrite these ages by using the ``--ages`` argument. The following is an example:
 ```bash
-python dataset/led_age_simulation.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --ages 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 --r90_hours 33000 --imgs true
+python dataset/led_age_simulation.py --src "./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" --dst dataset/heatmaps/heatmap_176_aged --ages 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 --r90_hours 33000 --imgs true
 ```
 
 You can also generate a time-series of data points, which can simulate the model receiving data as the LEDs are aging. This allows for a more finetuned response to the LED degradation problem. You can use the following command to generate this dataset:
 
 ```bash
-$ python dataset/led_age_series.py --src ".\dataset\heatmaps\heatmap_176\cleaned_LAMBERTIAN-IDW.npy" --dst dataset/exported/age-series --timestep 100 --time 50000
+$ python dataset/led_age_series.py --src "./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" --dst dataset/exported/age-series --timestep 100 --time 50000
 ```
 
 ## Heatmaps to datasets
