@@ -47,7 +47,7 @@ def main(args):
     loader = DataLoader(test_dataset, batch_size=len(test_dataset))
     X, y = next(iter(loader))
 
-    predictions = model.predict(X)
+    predictions = model.predict(X, eval=True)
     average_error = torch.norm(predictions - y, dim=1).mean().item()
     print("Average error:", average_error)
 

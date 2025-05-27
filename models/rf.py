@@ -35,11 +35,12 @@ class RF(BaseModel):
 
         self.model.fit(X, y)
 
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
+    def predict(self, X: torch.Tensor, eval: bool=False) -> torch.Tensor:
         """
         Predict using the model on the dataset.
 
-        :param dataset: The dataset to predict on.
+        :param X: The data to predict on.
+        :param eval: Whether or not it's in evaluation mode.
         :return: The predictions.
         """
         return torch.from_numpy(self.model.predict(X.numpy()))

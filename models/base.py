@@ -12,11 +12,12 @@ class BaseModel:
         """
         raise NotImplementedError("Fit method not implemented.")
 
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
+    def predict(self, X: torch.Tensor, eval: bool=False) -> torch.Tensor:
         """
         Predict using the model on data.
 
         :param X: The data to predict on.
+        :param eval: Whether or not it's in evaluation mode.
         :return: The predictions.
         """
         raise NotImplementedError("Predict method not implemented.")
