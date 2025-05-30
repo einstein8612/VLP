@@ -1,11 +1,12 @@
+import numpy as np
 import torch
+from sklearn.linear_model import LinearRegression, RANSACRegressor
 from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from dataset import FPDataset
 from models.base import BaseModel
-
 
 def init_weights(m):
     if isinstance(m, nn.Linear):
@@ -17,7 +18,7 @@ class NormalizeInput(nn.Module):
         return x / (x.norm(dim=1, keepdim=True) + 1e-8)
 
 class MLPOnline(BaseModel):
-    def __init__(self, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
+    def __init__(self, data_npy_path: str, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
         """
         Initialize the MLP model.
 
@@ -45,6 +46,9 @@ class MLPOnline(BaseModel):
         ).to(device)
 
         self.model.apply(init_weights)
+
+        self.data = np.load(data_npy_path)
+        self.scalars = np.ones(self.data.shape[2], dtype=np.float32)
 
         self.batch_size = batch_size
         self.lr = lr
@@ -84,8 +88,38 @@ class MLPOnline(BaseModel):
         :return: The predictions.
         """
         self.model.eval()
+
+        # Apply the scalars to the input data
+        X = X * self.scalars
+        # Make predictions
+        predictions = self.model.forward(X)
+
+        # If in evaluation mode, return the predictions directly
+        if eval:
+            return predictions
         
-        return self.model.forward(X)
+        # If in online learning mode, apply RANSAC to the predictions to refine the scalars
+        # before returning the predictions
+        
+        # Calculate the positions in the data array
+        min_positions = torch.zeros(2, dtype=torch.long)
+        max_positions = torch.tensor([self.data.shape[1] - 1, self.data.shape[0] - 1], dtype=torch.long)
+        positions = torch.clamp(torch.round(predictions / 10).long(), min=min_positions, max=max_positions)
+
+        # Extract the references from the data array using the positions
+        references = self.data[positions[:, 1], positions[:, 0]]
+        # Only consider references that are not -1, which indicates invalid data
+        mask = np.all(references != -1, axis=1)
+
+        # Use RANSAC to refine the scalars
+        base_model = LinearRegression()
+        ransac = RANSACRegressor(base_model, residual_threshold=1.0, max_trials=100)
+
+        for i in range(36):
+            ransac.fit(X[mask, i].reshape(-1, 1), references[mask, i])
+            self.scalars[i] *= ransac.estimator_.coef_[0]
+
+        return predictions
 
     def save(self, model_path: str):
         """
