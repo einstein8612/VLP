@@ -152,14 +152,13 @@ def main(args):
         sample_predictions = model.predict(aged_samples_X_t)
         sample_average_error = torch.norm(
             sample_predictions - aged_samples_y_t, dim=1).mean().item()
-        print("Samples had average error:", sample_average_error)
 
         # Test accuracy at this timestep
         decay_scalars = relative_decay[i, :]
         predictions = model.predict(test_X * decay_scalars, eval=True)
         average_error = torch.norm(predictions - test_y, dim=1).mean().item()
         bar.set_description(
-            f"Average error at {t} hours: {average_error:.2f} mm")
+            f"Average error at {t} hours: {average_error:.2f} mm, sample error: {sample_average_error:.2f} mm")
         errors.append(average_error)
 
     _, axs = plt.subplots(2)
