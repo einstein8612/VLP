@@ -113,7 +113,7 @@ class MLPOnline(BaseModel):
 
         # Use RANSAC to refine the scalars
         base_model = LinearRegression()
-        ransac = RANSACRegressor(base_model, residual_threshold=1.0, max_trials=100)
+        ransac = RANSACRegressor(base_model, residual_threshold=1.0, max_trials=10)
 
         for i in range(36):
             ransac.fit(X[mask, i].reshape(-1, 1), references[mask, i])
