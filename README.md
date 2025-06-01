@@ -187,3 +187,25 @@ $ python experiment.py --task "MLP" --dataset "./dataset/exported/data_176" --de
 # ...
 # Average error: 6.804797172546387
 ```
+
+## Run timeseries experiment
+
+In order to test our solution over a period of time where LEDs may dim, we can use the simulator provided in `experiment_timeseries.py`. A minimal example is found below. Please consult the source code if you need to tweak further.
+
+```bash
+$ python experiment_timeseries.py --task "MLP-TINY" --load_model "./saved_runs/MLP-TINY-1748798043.pth" --src ./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy --timestep 1000 --time 100000 --seed 42
+```
+
+This will generate a saved run at `./saved_timeseries_runs/MLP-TINY-{TIMESTAMP}`, where you can find the following files. The `results.json` will contain all reproducability parameters, as well as the errors and decays in arrays. This is useful for making figures afterwards manually. It will also give you a figure where you can see the (cumulative) error positioning error, as well as the minimum, average and maximum decay scalar at every timestep. An example can be seen below:
+
+![Example timeseries graph](./assets/readme/timeseries_example.png)
+
+### Comparison
+
+If you want to compare to other solutions, you can make use of the built in compare mode. This allows for n other runs to be displayed in our error graph. The following command demonstrates using it:
+
+```bash
+$ python experiment_timeseries.py --task "MLP-ONLINE-TINY" --load_model "./saved_runs/MLP-ONLINE-TINY-1748798403.pth" --src ./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy --timestep 1000 --time 100000 --seed 42 --compare-to "./saved_timeseries_runs/MLP-TINY-1748798275" "./saved_timeseries_runs/MLP-TINY-NORMALISE-1748798493"
+```
+
+![Example comparison timeseries graph](./assets/readme/timeseries_comparison_example.png)
