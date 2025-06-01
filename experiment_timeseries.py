@@ -1,15 +1,16 @@
-from tqdm import tqdm
-from models import register_models
+import argparse
+import json
+import os
+from time import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 import torch
-
-import matplotlib.pyplot as plt
-
-import argparse
+from tqdm import tqdm
 
 from dataset.led_age_series_util import calculate_decay_constant
+from models import register_models
 
 R90_MIN = 10000
 R90_MAX = 50000
@@ -141,7 +142,6 @@ def main(args):
         test_y, dtype=torch.float)*10
     relative_decay = torch.tensor(relative_decay, dtype=torch.float)
 
-    avg_decay = relative_decay.mean(dim=1)
     errors = []
     bar = tqdm(enumerate(timesteps), total=len(timesteps))
     for i, t in bar:
@@ -160,24 +160,70 @@ def main(args):
         bar.set_description(
             f"Average error at {t} hours: {average_error:.2f} mm, sample error: {sample_average_error:.2f} mm")
         errors.append(average_error)
+    
+    if not args.save:
+        return
+    
+    avg_decay = relative_decay.mean(dim=1)
+    min_decay = relative_decay.min(dim=1).values
+    max_decay = relative_decay.max(dim=1).values
+    
+    now = int(time())
+    
+    os.makedirs(f"./saved_timeseries_runs/{now}", exist_ok=True)
 
-    _, axs = plt.subplots(2)
+    # Save the results
+    _, axs = plt.subplots(2, figsize=(10, 10))
 
-    axs[0].plot(timesteps, errors, label=type(model).__name__)
+    axs[0].plot(timesteps, errors, label=f"{type(model).__name__} (Current Run)")
     axs[0].set(xlabel='Time in hours passed', ylabel='Positioning Error (mm)')
     axs[0].set(title='Positioning Error vs. LED Degradation')
+
+    if args.compare_to:
+        # Compare to past runs
+        for run in args.compare_to:
+            run_results = json.load(open(f"{run}/results.json", "r"))
+            run_errors = run_results["errors"]
+            if len(run_errors) != len(errors):
+                print(f"Skipping {run} due to mismatched length of errors")
+                continue
+            axs[0].plot(timesteps, run_errors, label=f"{run_results["model"]} (Run {os.path.basename(run)})")
+    
+    axs[0].legend()
 
     axs[1].plot(timesteps, avg_decay, label="Average Decay")
     axs[1].set(xlabel='Time in hours passed', ylabel='Average Decay Scalar')
     axs[1].set(title='Average Decay Scalar vs. Time')
+    axs[1].fill_between(timesteps, min_decay, max_decay, alpha=0.2, label="Min/Max Decay")
+    axs[1].legend()
 
-    plt.show()
+    plt.savefig(f"./saved_timeseries_runs/{now}/graph.png")
+    
+    results = {
+        "task": task,
+        "src": args.src,
+        "model": type(model).__name__,
+        "errors": errors,
+        "timesteps": timesteps.tolist(),
+        "decay_ks": decay_ks.tolist(),
+        "avg_decay": avg_decay.tolist(),
+        "min_decay": min_decay.tolist(),
+        "max_decay": max_decay.tolist(),
+        "args": vars(args),
+        "total_time": bar.format_dict['elapsed']
+    }
+
+    with open(f"./saved_timeseries_runs/{now}/results.json", "w") as f:
+        json.dump(results, f, indent=4)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Experiment Runner")
     parser.add_argument("--task", type=str, required=True, help="Task name")
     parser.add_argument("--src", type=str, required=True, help="Dataset name")
+    parser.add_argument("--save", type=bool, required=False, help="Whether to save the run details", default=True)
+    parser.add_argument("--compare-to", type=str, required=False, nargs='*',
+                        help="Files of past runs to compare against", default=None)
     parser.add_argument("--load_model", type=str,
                         required=True, help="Model to load")
     parser.add_argument(

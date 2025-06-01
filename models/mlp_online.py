@@ -113,7 +113,7 @@ class MLPOnline(BaseModel):
 
         # Use RANSAC to refine the scalars
         for i in range(36):
-            self.scalars[i] *= fit_ransac_line(X[mask, i].numpy().astype(np.float32), references[mask, i].astype(np.float32), threshold=1.0, max_iters=100, seed=self.seed)
+            self.scalars[i] *= fit_ransac_line(X[mask, i].numpy().astype(np.float32), references[mask, i].astype(np.float32), threshold=1.0, max_iters=10, seed=self.seed)
 
         return predictions
 

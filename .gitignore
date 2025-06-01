@@ -178,6 +178,7 @@ dataset/data.csv
 dataset/exported
 
 saved_runs/*
+saved_timeseries_runs/*
 
 heatmaps
 
