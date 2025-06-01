@@ -170,7 +170,7 @@ def main(args):
     
     now = int(time())
     
-    os.makedirs(f"./saved_timeseries_runs/{now}", exist_ok=True)
+    os.makedirs(f"./saved_timeseries_runs/{task}-{now}", exist_ok=True)
 
     # Save the results
     _, axs = plt.subplots(3, figsize=(10, 15))
@@ -205,7 +205,7 @@ def main(args):
     axs[2].fill_between(timesteps, min_decay, max_decay, alpha=0.2, label="Min/Max Decay")
     axs[2].legend()
 
-    plt.savefig(f"./saved_timeseries_runs/{now}/graph.png")
+    plt.savefig(f"./saved_timeseries_runs/{task}-{now}/graph.png")
     
     results = {
         "task": task,
@@ -221,7 +221,7 @@ def main(args):
         "total_time": bar.format_dict['elapsed']
     }
 
-    with open(f"./saved_timeseries_runs/{now}/results.json", "w") as f:
+    with open(f"./saved_timeseries_runs/{task}-{now}/results.json", "w") as f:
         json.dump(results, f, indent=4)
 
 
