@@ -20,6 +20,23 @@ source .venv/bin/activate # .\.venv\Scripts\Activate.ps1 on Windows
 $ pip install -r requirements.txt
 ```
 
+## Install RANSAC Line
+In order to do line fitting, we use a custom line-fitting library so we have the same line fit in the simulator as in the embedded version. This line fitting can be found [here](https://github.com/einstein8612/ransac-line).
+
+In order to install this, please follow the guide there or just copy paste these commands if you do not care about how it gets installed.
+
+```bash
+$ mkdir third_party
+$ cd third_party
+$ git clone git@github.com:einstein8612/ransac-line.git
+$ cd ransac-line/bindings/python/ransac_line
+$ pip install cffi setuptools
+$ python build_ffi.py
+$ cd ..
+$ pip install .
+$ cd ../../../..
+```
+
 ## Data
 
 To get started aqcuire the `mat_files` folder and store them in the dataset folder. Afterwards, run the script to translate them into a PyTorch set

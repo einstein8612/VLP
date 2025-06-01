@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from sklearn.linear_model import LinearRegression, RANSACRegressor
+from ransac_line import fit as fit_ransac_line
 from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -112,12 +112,8 @@ class MLPOnline(BaseModel):
         mask = np.all(references != -1, axis=1)
 
         # Use RANSAC to refine the scalars
-        base_model = LinearRegression()
-        ransac = RANSACRegressor(base_model, residual_threshold=1.0, max_trials=10)
-
         for i in range(36):
-            ransac.fit(X[mask, i].reshape(-1, 1), references[mask, i])
-            self.scalars[i] *= ransac.estimator_.coef_[0]
+            self.scalars[i] *= fit_ransac_line(X[mask, i].numpy().astype(np.float32), references[mask, i].astype(np.float32), threshold=1.0, max_iters=100, seed=self.seed)
 
         return predictions
 
