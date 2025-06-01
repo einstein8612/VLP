@@ -209,3 +209,7 @@ $ python experiment_timeseries.py --task "MLP-ONLINE-TINY" --load_model "./saved
 ```
 
 ![Example comparison timeseries graph](./assets/readme/timeseries_comparison_example.png)
+
+## Connected repositories
+- [r3fit](https://github.com/einstein8612/r3fit): Circle fitting library for estimating TX positions
+- [ransac-line](https://github.com/einstein8612/ransac-line): 2D-Line fitting library for degradation estimation
