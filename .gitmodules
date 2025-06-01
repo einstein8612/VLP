@@ -1,3 +1,0 @@
-[submodule "third_party/ransac-line"]
-	path = third_party/ransac-line
-	url = git@github.com:einstein8612/ransac-line.git
