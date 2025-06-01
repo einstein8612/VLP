@@ -173,11 +173,16 @@ def main(args):
     os.makedirs(f"./saved_timeseries_runs/{now}", exist_ok=True)
 
     # Save the results
-    _, axs = plt.subplots(2, figsize=(10, 10))
+    _, axs = plt.subplots(3, figsize=(10, 15))
 
+    # Plot the errors and cumulative errors
     axs[0].plot(timesteps, errors, label=f"{type(model).__name__} (Current Run)")
     axs[0].set(xlabel='Time in hours passed', ylabel='Positioning Error (mm)')
     axs[0].set(title='Positioning Error vs. LED Degradation')
+
+    axs[1].plot(timesteps, np.cumsum(errors), label=f"{type(model).__name__} (Current Run)")
+    axs[1].set(xlabel='Time in hours passed', ylabel='Cumulative Positioning Error (mm)')
+    axs[1].set(title='Cumulative Positioning Error vs. LED Degradation')
 
     if args.compare_to:
         # Compare to past runs
@@ -188,14 +193,17 @@ def main(args):
                 print(f"Skipping {run} due to mismatched length of errors")
                 continue
             axs[0].plot(timesteps, run_errors, label=f"{run_results["model"]} (Run {os.path.basename(run)})")
+            axs[1].plot(timesteps, np.cumsum(run_errors), label=f"{run_results["model"]} (Run {os.path.basename(run)})")
     
     axs[0].legend()
-
-    axs[1].plot(timesteps, avg_decay, label="Average Decay")
-    axs[1].set(xlabel='Time in hours passed', ylabel='Average Decay Scalar')
-    axs[1].set(title='Average Decay Scalar vs. Time')
-    axs[1].fill_between(timesteps, min_decay, max_decay, alpha=0.2, label="Min/Max Decay")
     axs[1].legend()
+
+    # Plot the decay scalars
+    axs[2].plot(timesteps, avg_decay, label="Average Decay")
+    axs[2].set(xlabel='Time in hours passed', ylabel='Average Decay Scalar')
+    axs[2].set(title='Average Decay Scalar vs. Time')
+    axs[2].fill_between(timesteps, min_decay, max_decay, alpha=0.2, label="Min/Max Decay")
+    axs[2].legend()
 
     plt.savefig(f"./saved_timeseries_runs/{now}/graph.png")
     
