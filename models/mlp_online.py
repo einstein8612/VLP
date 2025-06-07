@@ -48,7 +48,7 @@ class MLPOnline(BaseModel):
         self.model.apply(init_weights)
 
         self.data = np.load(data_npy_path)
-        self.scalars = np.ones(self.data.shape[2], dtype=np.float32)
+        self.scalars = torch.ones(self.data.shape[2], dtype=torch.float32).to(device)
 
         self.batch_size = batch_size
         self.lr = lr
