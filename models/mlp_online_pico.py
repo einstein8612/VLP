@@ -31,7 +31,7 @@ class MLPOnlinePico(BaseModel):
             nn.ReLU6(),
 
             nn.Linear(64, 32),
-            nn.SELU(),
+            nn.LeakyReLU(0.1),
 
             nn.Linear(32, 2),
         ).to(device)
