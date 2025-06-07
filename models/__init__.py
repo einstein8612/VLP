@@ -3,6 +3,7 @@ from utils.task_registry import TaskRegistry
 from .rf import RF
 from .mlp import MLP
 from .mlp_online import MLPOnline
+from .mlp_online_pico import MLPOnlinePico
 
 def register_models() -> TaskRegistry:
     """
@@ -17,5 +18,6 @@ def register_models() -> TaskRegistry:
     task_registry.register("MLP-TINY", MLP, epochs=25)
     task_registry.register("MLP-TINY-NORMALISE", MLP, epochs=25, normalize=True)
     task_registry.register("MLP-ONLINE-TINY", MLPOnline, data_npy_path="./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy", epochs=25)
+    task_registry.register("MLP-ONLINE-PICO", MLPOnlinePico, data_npy_path="./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy", epochs=50, batch_size=64, lr=0.001)
     
     return task_registry

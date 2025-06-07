@@ -17,7 +17,7 @@ class NormalizeInput(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return x / (x.norm(dim=1, keepdim=True) + 1e-8)
 
-class MLPOnline(BaseModel):
+class MLPOnlinePico(BaseModel):
     def __init__(self, data_npy_path: str, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
         """
         Initialize the MLP model.
@@ -27,22 +27,13 @@ class MLPOnline(BaseModel):
         self.model = nn.Sequential(
             NormalizeInput(),
 
-            nn.Linear(36, 256),
-            nn.ReLU(),
+            nn.Linear(36, 64),
+            nn.ReLU6(),
 
-            nn.Linear(256, 512),
-            nn.ReLU(),
+            nn.Linear(64, 32),
+            nn.SELU(),
 
-            nn.Linear(512, 1024),
-            nn.ReLU(),
-
-            nn.Linear(1024, 512),
-            nn.ReLU(),
-
-            nn.Linear(512, 256),
-            nn.ReLU(),
-
-            nn.Linear(256, 2),
+            nn.Linear(32, 2),
         ).to(device)
 
         self.model.apply(init_weights)
@@ -72,7 +63,7 @@ class MLPOnline(BaseModel):
 
         # Training loop
         self.model.train()
-        bar = tqdm(range(self.epochs), desc="Training MLPOnline", unit="epoch")
+        bar = tqdm(range(self.epochs), desc="Training MLP", unit="epoch")
         for _ in bar:
             for X, y in loader:
                 optimizer.zero_grad()
