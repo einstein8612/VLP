@@ -131,16 +131,16 @@ def main(args):
     aged_samples_X, aged_samples_y = generate_aged_samples(
         data, valid_mask, relative_decay, args.samples_per_timestep, rng)
     aged_samples_X, aged_samples_y = torch.tensor(
-        aged_samples_X, dtype=torch.float), torch.tensor(aged_samples_y, dtype=torch.float)*10
+        aged_samples_X, dtype=torch.float, device=args.device), torch.tensor(aged_samples_y, dtype=torch.float, device=args.device)*10
     print(
         f"Generated {aged_samples_X.shape[0]*aged_samples_X.shape[1]} samples; {aged_samples_X.shape[1]} samples at {aged_samples_X.shape[0]} timesteps")
 
     test_X, test_y = generate_test_set(data, valid_mask, 0.2, rng)
 
     # Translate to PyTorch
-    test_X, test_y = torch.tensor(test_X, dtype=torch.float), torch.tensor(
-        test_y, dtype=torch.float)*10
-    relative_decay = torch.tensor(relative_decay, dtype=torch.float)
+    test_X, test_y = torch.tensor(test_X, dtype=torch.float, device=args.device), torch.tensor(
+        test_y, dtype=torch.float, device=args.device)*10
+    relative_decay = torch.tensor(relative_decay, dtype=torch.float, device=args.device)
 
     errors = []
     bar = tqdm(enumerate(timesteps), total=len(timesteps))
@@ -164,10 +164,10 @@ def main(args):
     if not args.save:
         return
     
-    avg_decay = relative_decay.mean(dim=1)
-    min_decay = relative_decay.min(dim=1).values
-    max_decay = relative_decay.max(dim=1).values
-    
+    avg_decay = relative_decay.mean(dim=1).cpu().numpy()
+    min_decay = relative_decay.min(dim=1).values.cpu().numpy()
+    max_decay = relative_decay.max(dim=1).values.cpu().numpy()
+
     now = int(time())
     
     os.makedirs(f"./saved_timeseries_runs/{task}-{now}", exist_ok=True)

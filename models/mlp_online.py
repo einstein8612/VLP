@@ -47,8 +47,10 @@ class MLPOnline(BaseModel):
 
         self.model.apply(init_weights)
 
-        self.data = np.load(data_npy_path)
+        self.data = torch.tensor(np.load(data_npy_path), dtype=torch.float32, device=device)
         self.scalars = torch.ones(self.data.shape[2], dtype=torch.float32).to(device)
+        self.min_positions = torch.zeros(2, dtype=torch.long, device=device)
+        self.max_positions = torch.tensor([self.data.shape[1] - 1, self.data.shape[0] - 1], dtype=torch.long, device=device)
 
         self.batch_size = batch_size
         self.lr = lr
@@ -102,18 +104,16 @@ class MLPOnline(BaseModel):
         # before returning the predictions
         
         # Calculate the positions in the data array
-        min_positions = torch.zeros(2, dtype=torch.long)
-        max_positions = torch.tensor([self.data.shape[1] - 1, self.data.shape[0] - 1], dtype=torch.long)
-        positions = torch.clamp(torch.round(predictions / 10).long(), min=min_positions, max=max_positions)
+        positions = torch.clamp(torch.round(predictions / 10).long(), min=self.min_positions, max=self.max_positions)
 
         # Extract the references from the data array using the positions
         references = self.data[positions[:, 1], positions[:, 0]]
         # Only consider references that are not -1, which indicates invalid data
-        mask = np.all(references != -1, axis=1)
+        mask = torch.all(references != -1, axis=1)
 
         # Use RANSAC to refine the scalars
         for i in range(36):
-            self.scalars[i] *= fit_ransac_line(X[mask, i].numpy().astype(np.float32), references[mask, i].astype(np.float32), threshold=1.0, max_iters=10, seed=self.seed)
+            self.scalars[i] *= fit_ransac_line(X[mask, i].cpu().numpy().astype(np.float32), references[mask, i].cpu().numpy().astype(np.float32), threshold=1.0, max_iters=10, seed=self.seed)
 
         return predictions
 
