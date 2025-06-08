@@ -48,7 +48,7 @@ class MLPOnline(BaseModel):
         self.model.apply(init_weights)
 
         self.data = torch.tensor(np.load(data_npy_path), dtype=torch.float32, device=device)
-        self.scalars = torch.ones(self.data.shape[2], dtype=torch.float32).to(device)
+        self.scalars = torch.ones(self.data.shape[2], dtype=torch.float32, device=device)
         self.min_positions = torch.zeros(2, dtype=torch.long, device=device)
         self.max_positions = torch.tensor([self.data.shape[1] - 1, self.data.shape[0] - 1], dtype=torch.long, device=device)
 
