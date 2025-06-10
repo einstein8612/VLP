@@ -3,8 +3,6 @@ import os
 
 import numpy as np
 
-import matplotlib.pyplot as plt
-
 def main():
     parser = argparse.ArgumentParser("dataset_downsample")
     parser.add_argument(
