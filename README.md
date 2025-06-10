@@ -247,3 +247,4 @@ $ python experiment_timeseries.py --task "MLP-ONLINE-TINY" --load_model "./saved
 ## Connected repositories
 - [r3fit](https://github.com/einstein8612/r3fit): Circle fitting library for estimating TX positions
 - [ransac-line](https://github.com/einstein8612/ransac-line): 2D-Line fitting library for degradation estimation
+- [VLP-pico](https://github.com/einstein8612/VLP-pico): Implementation for the online pico model as found in this repository. Written for the RP2040 and RP2350 microcontrollers.
