@@ -18,7 +18,7 @@ class NormalizeInput(nn.Module):
         return x / (x.norm(dim=1, keepdim=True) + 1e-8)
 
 class MLPOnline(BaseModel):
-    def __init__(self, data_npy_path: str, batch_size=256, lr=0.001, epochs=250, device="cpu", seed=None):
+    def __init__(self, data_npy_path: str, batch_size=64, lr=0.001, epochs=250, device="cpu", seed=None):
         """
         Initialize the MLP model.
 
