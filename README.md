@@ -139,6 +139,40 @@ In order to use cleaned and/or augmented heatmaps in an experiment you need to t
 $ python dataset/heatmap_to_dataset.py --src "dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" --dst "dataset/exported/data_176_cleaned" --seed 42
 ```
 
+## Downsample/augment data
+
+In order to run on limited hardware, and to test having a lower amount of samples, we can downsample our original data and then augment it using the Lambertian model.
+
+We do this using the following commands to first downsample the data:
+
+```bash
+$ python dataset/downsample.py \
+    --src "dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy" \
+    --dst "dataset/heatmaps/heatmap_176_downsampled_4" \
+    --factor 4 \
+    --cross_x_start 121 \
+    --cross_x_end 161 \
+    --cross_y_start 121 \
+    --cross_y_end 155
+```
+
+and then augment it back to 1cm:
+
+```bash
+$ python dataset/augment.py \
+    --src "dataset/heatmaps/heatmap_176_downsampled_4" \
+    --dst "dataset/heatmaps/heatmap_176_augmented_4_downsampled_4/augmented.npy" \
+    --factor 4 \
+    --cross_x_start 121 \
+    --cross_x_end 161 \
+    --cross_y_start 121 \
+    --cross_y_end 155 \
+    --final_size_x 282 \
+    --final_size_y 276
+```
+
+_Note that the current setup only allows for you to augment back to 1-cm precision, as this is how the rest of the codebase is structured. This means you must run the same factor in the downsample and upsample/augment command. The cross is also not necessary, but added for completeness in a comparison between clean and augmented data._
+
 ## Run experiment (Training)
 
 In order to test this data's efficiency at generating positions, we can run experiments with the following command:
