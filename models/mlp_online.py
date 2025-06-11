@@ -11,11 +11,6 @@ from models.base import BaseModel
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
-        
-
-class NormalizeInput(nn.Module):
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return x / (x.norm(dim=1, keepdim=True) + 1e-8)
 
 class MLPOnline(BaseModel):
     def __init__(self, data_npy_path: str, batch_size=64, lr=0.001, epochs=250, device="cpu", seed=None):
