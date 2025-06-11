@@ -25,8 +25,6 @@ class MLPOnlinePico(BaseModel):
         :param seed: Controls the randomness of the estimator.
         """
         self.model = nn.Sequential(
-            NormalizeInput(),
-
             nn.Linear(36, 64),
             nn.ReLU6(),
 

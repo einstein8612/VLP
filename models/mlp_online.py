@@ -25,8 +25,6 @@ class MLPOnline(BaseModel):
         :param seed: Controls the randomness of the estimator.
         """
         self.model = nn.Sequential(
-            NormalizeInput(),
-
             nn.Linear(36, 256),
             nn.ReLU(),
 
