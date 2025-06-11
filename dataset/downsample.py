@@ -3,6 +3,15 @@ import os
 
 import numpy as np
 
+def format_array(arr, values_per_line=12):
+    flat = arr.flatten()
+    lines = []
+    for i in range(0, len(flat), values_per_line):
+        chunk = flat[i:i + values_per_line]
+        line = ", ".join(f"{x}" for x in chunk)
+        lines.append(line)
+    return ",\n    ".join(lines)
+
 def main():
     parser = argparse.ArgumentParser("dataset_downsample")
     parser.add_argument(
@@ -57,10 +66,10 @@ def main():
 
     print(f"Exporting data to {c_file}")
     with open(c_file, "w") as f:
-        f.write(f"const float downsampled_data_q1[] = {{{", ".join(f"{x}" for x in q1_downsampled.flatten())}}};\n")
-        f.write(f"const float downsampled_data_q2[] = {{{", ".join(f"{x}" for x in q2_downsampled.flatten())}}};\n")
-        f.write(f"const float downsampled_data_q3[] = {{{", ".join(f"{x}" for x in q3_downsampled.flatten())}}};\n")
-        f.write(f"const float downsampled_data_q4[] = {{{", ".join(f"{x}" for x in q4_downsampled.flatten())}}};\n")
+        f.write(f"const float downsampled_data_q1[] = {{\n    {format_array(q1_downsampled)}\n}};\n")
+        f.write(f"const float downsampled_data_q2[] = {{\n    {format_array(q2_downsampled)}\n}};\n")
+        f.write(f"const float downsampled_data_q3[] = {{\n    {format_array(q3_downsampled)}\n}};\n")
+        f.write(f"const float downsampled_data_q4[] = {{\n    {format_array(q4_downsampled)}\n}};\n")
         f.write(f"unsigned int downsampled_data_q_height = {q1_downsampled.shape[0]};\n")
         f.write(f"unsigned int downsampled_data_q_width = {q1_downsampled.shape[1]};\n")
         f.write(f"unsigned int downsampled_data_q_no_led = {q1_downsampled.shape[2]};\n")
