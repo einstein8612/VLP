@@ -11,7 +11,43 @@ from models.base import BaseModel
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
-        
+
+class BottleneckBlock(nn.Module):
+    def __init__(self, dim, factor):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim, int(dim * factor)),
+            nn.Hardswish(),
+            nn.Linear(int(dim * factor), dim)
+        )
+        self.activation = nn.Hardswish()
+
+    def forward(self, x):
+        return self.activation(self.net(x) + x)  # residual
+
+class MLPResNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.norm = NormalizeInput()
+
+        self.entry = nn.Sequential(
+            nn.Linear(36, 256),
+            nn.ReLU()
+        )
+
+        self.res_block1 = BottleneckBlock(256, 0.1)
+        self.res_block2 = BottleneckBlock(256, 0.1)
+
+        self.out = nn.Sequential(
+            nn.Linear(256, 2)
+        )
+
+    def forward(self, x):
+        x = self.norm(x)
+        x = self.entry(x)
+        x = self.res_block1(x)
+        x = self.res_block2(x)
+        return self.out(x)
 
 class NormalizeInput(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -24,17 +60,7 @@ class MLPOnlinePico(BaseModel):
 
         :param seed: Controls the randomness of the estimator.
         """
-        self.model = nn.Sequential(
-            NormalizeInput(),
-
-            nn.Linear(36, 64),
-            nn.ReLU6(),
-
-            nn.Linear(64, 32),
-            nn.LeakyReLU(0.1),
-
-            nn.Linear(32, 2),
-        ).to(device)
+        self.model = MLPResNet().to(device)
 
         self.model.apply(init_weights)
 
