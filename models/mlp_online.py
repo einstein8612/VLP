@@ -71,7 +71,7 @@ class MLPOnline(BaseModel):
                 optimizer.zero_grad()
                 outputs = self.model(X)
                 # loss = (torch.norm(outputs - y.float(), dim=1)**2).mean()
-                loss = criterion(outputs, y.float())
+                loss = criterion(outputs, y.float()/self.max_positions.float())
                 loss.backward()
                 optimizer.step()
             bar.set_postfix({"loss": loss.item()})
@@ -89,7 +89,7 @@ class MLPOnline(BaseModel):
         # Apply the scalars to the input data
         X = X * self.scalars
         # Make predictions
-        predictions = self.model.forward(X)
+        predictions = self.model.forward(X) * self.max_positions.float()
 
         # If in evaluation mode, return the predictions directly
         if eval:
