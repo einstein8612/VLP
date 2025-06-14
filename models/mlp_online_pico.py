@@ -17,10 +17,10 @@ class BottleneckBlock(nn.Module):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(dim, int(dim * factor)),
-            nn.Hardswish(),
+            nn.ReLU(),
             nn.Linear(int(dim * factor), dim)
         )
-        self.activation = nn.Hardswish()
+        self.activation = nn.ReLU()
 
     def forward(self, x):
         return self.activation(self.net(x) + x)  # residual
@@ -35,8 +35,8 @@ class MLPResNet(nn.Module):
             nn.ReLU()
         )
 
-        self.res_block1 = BottleneckBlock(256, 0.1)
-        self.res_block2 = BottleneckBlock(256, 0.1)
+        self.res_block1 = BottleneckBlock(256, 0.25)
+        self.res_block2 = BottleneckBlock(256, 0.25)
 
         self.out = nn.Sequential(
             nn.Linear(256, 2)
