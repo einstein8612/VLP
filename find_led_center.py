@@ -131,20 +131,22 @@ def main():
         plt.plot(kasa_circle_x, kasa_circle_y, color="green", linewidth=2)
 
         # Plot the TX positions
-        plt.scatter(circle.x, circle.y, c="red", s=1, label="R3Fit (Us)")
+        plt.scatter(circle.x, circle.y, c="red", s=1, label="R3Fit (Ours)")
         plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=1, label="Kasa (Old)")
         plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=1, label="Original TX Position")
 
         plt.colorbar()
-        plt.title(f"LED {i} - Circle Fit Comparison")
-        plt.xlabel("X-axis")
-        plt.ylabel("Y-axis")
+        plt.title(f"LED {i} - Circle Fit Comparison", fontsize=14)
+        plt.xlabel("x-axis (cm)", fontsize=14)
+        plt.ylabel("y-axis (cm)", fontsize=14)
         plt.legend()
 
         plt.xlim(0, data.shape[1])
         plt.ylim(0, data.shape[0])
 
-        plt.savefig(f"leds/led_{i}_circle_fit.png")
+        plt.tight_layout()
+
+        plt.savefig(f"leds/led_{i}_circle_fit.pdf")
         
         plt.clf()
     
