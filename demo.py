@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from models.mlp import MLP
 from models.mlp_online_pico import MLPOnlinePico
+from models.pico_interface import PicoInterface
 
 R90_MIN = 10000
 R90_MAX = 50000
@@ -299,7 +300,7 @@ class VLPDemoApp:
         elif model_type == "ResidualMLP (Online)":
             return self.online_model
         elif model_type == "Pico":
-            return self.online_model
+            return self.pico_model
 
     def create_widgets(self):
         # Create a horizontal frame to hold both button and dropdown
@@ -340,6 +341,9 @@ class VLPDemoApp:
             messagebox.showerror("Error", "Please select a valid model type.")
             return
         self.dropdown.config(state="disabled")
+
+        if model_type == "Pico":
+            self.pico_model = PicoInterface(serial_port="/dev/ttyACM0")
 
         for t in tqdm(range(100)):
             # Simulate degradation over time
