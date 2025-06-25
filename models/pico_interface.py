@@ -33,7 +33,7 @@ class PicoInterface(BaseModel):
 
         :param serial_port: The serial port to use for communication.
         """
-        self.serial = Serial(serial_port, 9600, timeout=1)
+        self.serial = Serial(serial_port, 9600, timeout=100)
 
     def fit(self, dataset: FPDataset):
         """
@@ -53,10 +53,10 @@ class PicoInterface(BaseModel):
         """
         
         output = []
-        # If eval is True, we send all inputs at once and read the scalar output in a loop.
-        if eval:
+        # If eval is False, we send all inputs at once and read the scalar output in a loop.
+        if not eval:
             for i in range(0, len(X)):
-                X_i = X[i].unsqueeze(0)
+                X_i = X[i]
                 self.serial.write(pack_input(eval, X_i.flatten().tolist()))
             
             for _ in range(18):
@@ -67,9 +67,9 @@ class PicoInterface(BaseModel):
             
             return torch.tensor(output, dtype=torch.float32)
 
-        # If eval is False, we send each input one by one and read the prediction output.
+        # If eval is True, we send each input one by one and read the prediction output.
         for i in range(0, len(X)):
-            X_i = X[i].unsqueeze(0)
+            X_i = X[i]
             self.serial.write(pack_input(eval, X_i.flatten().tolist()))
             response_bytes = self.serial.read_until(b'BIGGER_THAN_8_BYTES', 8)
             x, y = unpack_output(response_bytes)

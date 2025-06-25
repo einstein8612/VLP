@@ -97,12 +97,16 @@ class VLPDemoApp:
         self.right_frame.pack(side="right", fill="both", expand=True)
 
         self.degradation_factors = np.ones(leds.shape[0], dtype=np.float32)
+        
+        self.baseline_model = None
+        self.online_model = None
+        self.pico_model = None
 
         rng = np.random.default_rng(42)
         self.generate_base_rss()
         self.generate_relative_decay(rng)
         self.load_models()
-        self.generate_aged_samples(samples_per_timestep=100, rng=rng)
+        self.generate_aged_samples(samples_per_timestep=50, rng=rng)
 
         self.create_led_visualization()
         self.create_positioning_area()
@@ -146,7 +150,7 @@ class VLPDemoApp:
 
         # Age the samples
         # Get the samples for each LED at each timestep with the same sample index. Shape (timesteps, samples_per_timestep, leds_n)
-        samples = flat_data[sample_flat_idxs, led_ids]
+        samples = flat_data[sample_flat_idxs, led_ids].clone()
         # Apply the relative decay to the samples
         self.aged_samples = samples * self.relative_decay[:, None, :]
 
@@ -241,14 +245,14 @@ class VLPDemoApp:
 
     def load_models(self):
         self.baseline_model = MLP()
-        self.baseline_model.load("./saved_runs/MLP-TINY-1750336759.pth")
+        self.baseline_model.load("./saved_runs/MLP-TINY-1748798043.pth")
 
         self.online_model = MLPOnlinePico(
             data_npy_path="./dataset/heatmaps/heatmap_176/cleaned_LAMBERTIAN-IDW.npy",
             device="cpu",
             seed=42
         )
-        self.online_model.load("./saved_runs/MLP-ONLINE-PICO-1750342434.pth")
+        self.online_model.load("./saved_runs/MLP-ONLINE-PICO-1750171775.pth")
 
         self.data = self.online_model.data  # Reuse the data from the model
 
@@ -300,6 +304,8 @@ class VLPDemoApp:
         elif model_type == "ResidualMLP (Online)":
             return self.online_model
         elif model_type == "Pico":
+            if self.pico_model is None:
+                self.pico_model = PicoInterface(serial_port="/dev/ttyACM0")
             return self.pico_model
 
     def create_widgets(self):
@@ -334,6 +340,12 @@ class VLPDemoApp:
                 self.aged_samples[t, :, :],
                 eval=False,
             )
+        if model_type == "Pico":
+            # For Pico, we need to send a warmup batch
+            self.pico_model.predict(
+                self.aged_samples[t, :, :],
+                eval=False,
+            )
 
     def run_simulation(self):
         model_type = self.dropdown.get()
@@ -342,7 +354,7 @@ class VLPDemoApp:
             return
         self.dropdown.config(state="disabled")
 
-        if model_type == "Pico":
+        if model_type == "Pico" and self.pico_model is None:
             self.pico_model = PicoInterface(serial_port="/dev/ttyACM0")
 
         for t in tqdm(range(100)):
