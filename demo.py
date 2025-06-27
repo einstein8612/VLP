@@ -88,13 +88,13 @@ class VLPDemoApp:
         self.root.title("Visible Light Positioning under Degradation Demo")
 
         top_frame = ttk.Frame(root)
-        top_frame.pack(side="top", fill="x")
+        top_frame.pack(side="top", fill="both")
 
         self.left_frame = ttk.Frame(top_frame)
-        self.left_frame.pack(side="left", fill="both", expand=True)
+        self.left_frame.pack(side="left", fill="none", expand=True)
 
         self.right_frame = ttk.Frame(top_frame)
-        self.right_frame.pack(side="right", fill="both", expand=True)
+        self.right_frame.pack(side="right", fill="none", expand=True)
 
         self.degradation_factors = np.ones(leds.shape[0], dtype=np.float32)
         
@@ -165,7 +165,7 @@ class VLPDemoApp:
             ).reshape(276, 282)
 
     def create_led_visualization(self):
-        self.fig = Figure(figsize=(6, 6), dpi=100)
+        self.fig = Figure(figsize=(10, 10), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.left_frame)
         self.ax = self.fig.add_subplot()
 
@@ -188,8 +188,8 @@ class VLPDemoApp:
         return img
 
     def create_positioning_area(self):
-        self.fig2 = Figure(figsize=(6, 6), dpi=100)
-        self.fig2.tight_layout(pad=0.5)
+        self.fig2 = Figure(figsize=(10, 10), dpi=100)
+        # self.fig2.tight_layout(pad=0.5)
         self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.right_frame)
         self.ax2 = self.fig2.add_subplot()
 
@@ -385,5 +385,7 @@ class VLPDemoApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.attributes("-fullscreen", True)
+    root.attributes('-zoomed', True)
     app = VLPDemoApp(root)
     root.mainloop()
