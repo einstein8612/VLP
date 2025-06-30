@@ -150,8 +150,12 @@ def main(args):
                                                             :, :], aged_samples_y[i, :, :]
 
         sample_predictions = model.predict(aged_samples_X_t)
-        sample_average_error = torch.norm(
-            sample_predictions - aged_samples_y_t, dim=1).mean().item()
+        # Pico Interface does not support sample prediction accuracy, so
+        if sample_predictions.shape != aged_samples_y_t.shape:
+            sample_average_error = float('nan')
+        else:
+            sample_average_error = torch.norm(
+                sample_predictions - aged_samples_y_t, dim=1).mean().item()
 
         # Test accuracy at this timestep
         decay_scalars = relative_decay[i, :]

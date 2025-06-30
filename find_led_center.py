@@ -106,6 +106,9 @@ def main():
     led_positions = []
 
     for i in tqdm(range(data.shape[2]), desc="Fitting circles"):
+        if i != 29:
+            continue
+
         relevant_points = circle_points[circle_points[:, 2] == i][:, [1,0]].astype(np.float64)
         circle = r3fit.fit(relevant_points, 10000, 0.05)
         kasa_circle = kasa_circle_fit(relevant_points)
@@ -115,40 +118,52 @@ def main():
         if not args.imgs:
             continue
 
+        # data_i = data[:, :, i]
+        # data_i[circle_mask[:, :, i] == 0] = np.nan
+
         plt.imshow(data[:, :, i], origin="lower")
 
         # Plot the points that are used to fit the circle
-        plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="purple", s=1, label="Points used to fit circle")
+        # plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="purple", s=1, label="Points used to fit circle")
 
         # Plot the fitted circle
         circle_x = circle.x + circle.r * np.cos(np.linspace(0, 2 * np.pi, 100))
         circle_y = circle.y + circle.r * np.sin(np.linspace(0, 2 * np.pi, 100))
-        plt.plot(circle_x, circle_y, color="red", linewidth=2)
+        # plt.plot(circle_x, circle_y, color="red", linewidth=2)
 
         # Plot the Kåsa circle
         kasa_circle_x = kasa_circle[0] + kasa_circle[2] * np.cos(np.linspace(0, 2 * np.pi, 100))
         kasa_circle_y = kasa_circle[1] + kasa_circle[2] * np.sin(np.linspace(0, 2 * np.pi, 100))
-        plt.plot(kasa_circle_x, kasa_circle_y, color="green", linewidth=2)
+        # plt.plot(kasa_circle_x, kasa_circle_y, color="green", linewidth=2)
 
         # Plot the TX positions
-        plt.scatter(circle.x, circle.y, c="red", s=1, label="R3Fit (Ours)")
-        plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=1, label="Kasa (Old)")
-        plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=1, label="Original TX Position")
+        # plt.scatter(circle.x, circle.y, c="red", s=1, label="R3Fit (Ours)")
+        # plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=1, label="Kasa (Old)")
+        # plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=1, label="Original TX Position")
 
         plt.colorbar()
-        plt.title(f"LED {i} - Circle Fit Comparison", fontsize=14)
+        # plt.title(f"LED {i} - Circle Fit Comparison", fontsize=14)
         plt.xlabel("x-axis (cm)", fontsize=14)
         plt.ylabel("y-axis (cm)", fontsize=14)
-        plt.legend()
 
-        plt.xlim(0, data.shape[1])
-        plt.ylim(0, data.shape[0])
+        plt.xlim(161, data.shape[1]-1)
+        plt.ylim(155, data.shape[0]-1)
 
         plt.tight_layout()
 
-        plt.savefig(f"leds/led_{i}_circle_fit.pdf")
-        
-        plt.clf()
+        plt.plot(circle_x, circle_y, color="red", linewidth=2)
+        plt.plot(kasa_circle_x, kasa_circle_y, color="green", linewidth=2)
+
+        plt.scatter(circle.x, circle.y, c="red", s=20, label="R3Fit (Ours)")
+        plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=20, label="Kasa (Old)")
+        plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=20, label="Original TX Position")
+
+        plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="purple", s=1, label="Points used to fit circle")
+
+        plt.legend()
+        # plt.show()
+        plt.savefig(f"leds/led_{i}_circle_fit.png")
+        # plt.clf()
     
     # Save the LED positions to a file
     json.dump(led_positions, open("leds/led_positions.json", "w"))

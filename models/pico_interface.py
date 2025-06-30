@@ -27,7 +27,7 @@ Pico Interface for Serial Communication
 This class interfaces with a Pico device over serial communication to send input data and receive predictions.
 """
 class PicoInterface(BaseModel):
-    def __init__(self, serial_port='/dev/ttyACM0'):
+    def __init__(self, serial_port='/dev/ttyACM0', device="", seed=42):
         """
         Initialize the Pico Interface.
 
