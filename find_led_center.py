@@ -106,8 +106,8 @@ def main():
     led_positions = []
 
     for i in tqdm(range(data.shape[2]), desc="Fitting circles"):
-        if i != 29:
-            continue
+        # if i != 29:
+        #     continue
 
         relevant_points = circle_points[circle_points[:, 2] == i][:, [1,0]].astype(np.float64)
         circle = r3fit.fit(relevant_points, 10000, 0.05)
@@ -121,7 +121,7 @@ def main():
         # data_i = data[:, :, i]
         # data_i[circle_mask[:, :, i] == 0] = np.nan
 
-        plt.imshow(data[:, :, i], origin="lower")
+        plt.imshow(data[:, :, i] / data[:, :, i].max(), origin="lower")
 
         # Plot the points that are used to fit the circle
         # plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="purple", s=1, label="Points used to fit circle")
@@ -141,10 +141,11 @@ def main():
         # plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=1, label="Kasa (Old)")
         # plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=1, label="Original TX Position")
 
-        plt.colorbar()
+        cbar = plt.colorbar()
+        cbar.ax.tick_params(labelsize=14)
         # plt.title(f"LED {i} - Circle Fit Comparison", fontsize=14)
-        plt.xlabel("x-axis (cm)", fontsize=14)
-        plt.ylabel("y-axis (cm)", fontsize=14)
+        plt.xlabel("x-axis (cm)", fontsize=16)
+        plt.ylabel("y-axis (cm)", fontsize=16)
 
         plt.xlim(161, data.shape[1]-1)
         plt.ylim(155, data.shape[0]-1)
@@ -152,17 +153,20 @@ def main():
         plt.tight_layout()
 
         plt.plot(circle_x, circle_y, color="red", linewidth=2)
-        plt.plot(kasa_circle_x, kasa_circle_y, color="green", linewidth=2)
+        plt.plot(kasa_circle_x, kasa_circle_y, color="cyan", linewidth=2)
 
-        plt.scatter(circle.x, circle.y, c="red", s=20, label="R3Fit (Ours)")
-        plt.scatter(kasa_circle[0], kasa_circle[1], c="green", s=20, label="Kasa (Old)")
-        plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="blue", s=20, label="Original TX Position")
+        plt.scatter(circle.x, circle.y, c="red", s=50, label="RANSAC (Ours)")
+        plt.scatter(kasa_circle[0], kasa_circle[1], c="cyan", s=50, label="Kasa")
+        plt.scatter(get_tx_positions()[i][0]/10, get_tx_positions()[i][1]/10, c="black", s=50, label="Original TX Position")
 
-        plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="purple", s=1, label="Points used to fit circle")
+        plt.scatter(relevant_points[:, 0], relevant_points[:, 1], c="#FF7600", s=3, label="Points used to fit circle")
 
-        plt.legend()
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+
+        plt.legend(fontsize=12, loc='lower left')
         # plt.show()
-        plt.savefig(f"leds/led_{i}_circle_fit.png")
+        plt.savefig(f"leds/led_{i}_circle_fit.pdf")
         # plt.clf()
     
     # Save the LED positions to a file
